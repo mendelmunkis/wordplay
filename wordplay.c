@@ -1,9 +1,15 @@
 /*
 
-Wordplay Version 7.20         08-21-94
+Wordplay Version 7.21         09-11-95
 
 Written by Evans A Criswell at the University of Alabama in Huntsville
 
+09-11-95 In the anagramr7 function, I check the product of the maximum
+	 "levels deep" remaining and the length of the longest candidate
+	 word.  If this product is less than the length of the string
+	 passed in, a "dead end" condition exists.  This makes the program
+	 run significantly faster for longer strings if the maximum
+	 depth option is used.
 08-21-94 Added "wordfile from stdin" option using "-f -"  
 	 Fixed "4" bug.  Digits in a string disqualify the string.
 	 Vowel-check override option added.
@@ -93,6 +99,7 @@ versions were written in FORTRAN 77.
 
 Note:  There was no version 5.12.  It was called 5.20 instead.
 
+Version 7.21  09-11-95  Speed increase.
 Version 7.20  08-21-94  Wordfile from stdin capability, bug fixes.
 Version 7.11  08-16-94  Speed increase.
 Version 7.10  08-14-94  Program uses much less memory.
@@ -130,7 +137,7 @@ Version 1.00  03-29-91  One and two word anagrams
 #define max(A, B) ((A) > (B) ? (A) : (B))
 #define min(A, B) ((A) < (B) ? (A) : (B))
 
-#define DEFAULT_WORD_FILE "words700.txt"
+#define DEFAULT_WORD_FILE "words721.txt"
 #define WORDBLOCKSIZE 4096
 #define MAX_WORD_LENGTH 128
 #define SAFETY_ZONE MAX_WORD_LENGTH + 1
@@ -158,6 +165,7 @@ int     rec_anag_count;  /*  For recursive algorithm, keeps track of number
 			 of anagrams fond */
 int     adjacentdups;
 int     specfirstword;
+int     maxdepthspec;
 int     silent;
 int     max_depth;
 int     vowelcheck;
@@ -225,7 +233,7 @@ int main (int argc, char *argv[])
   if (argc < 2)
   {
     fprintf (stderr, 
-	    "Wordplay Version 7.20  08-21-94         by Evans A Criswell\n");
+	    "Wordplay Version 7.21  09-11-95, 1991   by Evans A Criswell\n");
     fprintf (stderr, 
 	    "University of Alabama in Huntsville     criswell@cs.uah.edu\n\n");
     fprintf (stderr, "Usage:  ");
@@ -256,6 +264,7 @@ int main (int argc, char *argv[])
   specfirstword = 0;     /*  this is the permanent one */
   silent = 0;
   vowelcheck = 1;
+  maxdepthspec = 0;
 
   maxcwordlength = MAX_WORD_LENGTH;
   mincwordlength = 0;
@@ -316,7 +325,8 @@ int main (int argc, char *argv[])
 					  ((int) argv[iarg][i++] - (int) '0');
                        i--;
 		       break;
-            case 'd' : max_depth = 0;
+            case 'd' : maxdepthspec = 1;
+                       max_depth = 0;
 		       i++;
 		       while ((argv[iarg][i] >= '0') && (argv[iarg][i] <= '9'))
 			 max_depth = max_depth * 10 +
@@ -341,7 +351,7 @@ int main (int argc, char *argv[])
 
   if (silent == 0)
   {
-    printf ("Wordplay Version 7.20  08-21-94         by Evans A Criswell\n");
+    printf ("Wordplay Version 7.21  09-11-95, 1991   by Evans A Criswell\n");
     printf ("University of Alabama in Huntsville     criswell@cs.uah.edu\n\n");
   }
 
@@ -525,8 +535,9 @@ int main (int argc, char *argv[])
       if (words2mem[i] == '\0') words2[j++] = words2mem + i + 1;
 
 
-  if (silent == 0) printf ("\n%d words have been loaded. (%d byte block)\n", 
-			    ncount, w2size);
+  if (silent == 0) printf ("\n%d words loaded (%d byte block).  " 
+                           "Longest kept:  %d letters.\n",
+			    ncount, w2size, longestlength);
 
   if (ncount == 0)
   {
@@ -751,6 +762,7 @@ int main (int argc, char *argv[])
     }
     while (curpos < ncount); 
   }
+
 /* Create indexes into wordss array by first letter.  Words with first
    letter "A" will be will be in elements findx1[i] through findx2[i] 
    of array wordss.  Of course, the algorithm below works because 
@@ -833,10 +845,8 @@ int main (int argc, char *argv[])
 
     anagramr7 (initword, accum, &minkey, &level);
     if (rec_anag_count == 0) 
-    {
       if (silent == 0) 
 	printf ("\nNo anagrams found by recursive algorithm.\n");
-    }
   }
 
   if ((specfirstword == 1) && (recursiveanag))
@@ -899,14 +909,17 @@ char *alphabetic (char *s)
 
 int numvowels (char *s)
 {
-  int i, vcount;
+  int vcount;
+  char *cptr;
 
   vcount = 0;
 
-  for (i = 0; i < (int) strlen (s); i++)
-    if ((s[i] == 'A') || (s[i] == 'E') || (s[i] == 'I') || 
-	(s[i] == 'O') || (s[i] == 'U') || (s[i] == 'Y'))
-      vcount++;
+  for (cptr = s; *cptr != '\0'; cptr++)
+    switch (*cptr)
+    {
+      case 'A':  case 'E':  case 'I':  case 'O':  case 'U':  case 'Y':  
+	vcount++; break;
+    }
   return (vcount);
 }
 
@@ -932,6 +945,17 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     (*level)--;
     return;
   }
+
+/*  If the number of allowable additional "levels" times the length of
+    the longest candidate word is less than the length of the string
+    passed in, we know this is a "dead end".    */
+
+  if (maxdepthspec == 1)
+    if ((max_depth - *level) * longestlength < strlen(s))
+    {
+      (*level)--;
+      return;
+    }
 
 /*  If no vowels, dead end  */
 
@@ -966,10 +990,8 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     anagram -- treat as a dead end  */
 
     if (adjacentdups == 0)
-    {
       if ((*level > 0) && (strcmp (words2ptrs[i], accum[*level - 1]) == 0)) 
         continue;
-    }
 
 /*  Extract a word from the string being anagrammed.  */
 

@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------------
 
-Wordplay Version 7.20     Evans A Criswell   08-21-94
+Wordplay Version 7.21     Evans A Criswell   09-11-95
 
 ------------------------------------------------------------------------------
 
 This program was written for fun and is free.  Distribute it as you please,
-but please distribute the entire package, with the original words700.txt and 
+but please distribute the entire package, with the original words721.txt and 
 the readme file.  If you modify the code, please mention my name in it as the
 original author.  Please send me a copy of improvements you make, because I
 may include them in a future version.
@@ -38,32 +38,44 @@ spell words.
 Wordplay, by using a list of words, takes a specified string of letters and 
 uses the list of words to find anagrams of the string.  
 
+By the way, "Wordplay" anagrams to "Rowdy Pal", and the program really can
+live up to that particular anagram.  I have been able to come up with
+anagrams of most of my coworkers' names that are humorous, descriptive,
+satirical, or, occasionally, quite vulgar.  
 ------------------------------------------------------------------------------
 
 Compiling the program:
 
-Under UNIX, issue the command
+The only version of Wordplay that requires compilation is the UNIX version.
+The PC versions contain a pre-compiled executable since most people do not
+have 32-bit C compilers on their PC's.  The source is provided in all the
+packages.  I recommend the Gnu C compiler for DOS for compiling it.  There
+is a file in the DOS package that tells where to get the package, as well as
+how to set environment variables for the GO32 extender.
 
-  cc -o wordplay wordplay.c
+Under UNIX, the program should be compiled with an ANSI C compiler.  Never
+fear; it's easy.  If you have the GNU C compiler, use it as follows:
+
+  gcc -O -o wordplay wordplay.c
+
+If you do not have "gcc", or for whatever reason, wish to use your machine's
+native compiler, use "cc" in place of "gcc", as follows:
+
+  cc -O -o wordplay wordplay.c
 
 This assumes your native "cc" is an ANSI compiler.  If not, it WILL NOT WORK.
-If you have gcc, use it instead:
+If your compiler does not support the optimization option "-O", leave it out.
 
-  gcc -o wordplay wordplay.c
-
-Feel free to use optimization options!  They do make a significant difference
-with some compilers.
-
+Feel free to use optimization options that your particular compiler offers.
+They do make a significant difference with some compilers.
 -----------------------------------------------------------------------------
 
 Usage:
 
-IMPORTANT!!!!  The options have changed significantly since version 6.00!!!
+To use the program, simply invoke the program with a combination of options
+that make sense together.  Here is the format:
 
-To use the program, invoke the program with a combination of options that
-make sense.  Here is the format:
-
-     wordplay "string to anagram" [-slxavnXmXdX] [-w word] [-f wordfile]
+     wordplay string [-slxavnXmXdX] [-w word] [-f wordfile]
 
 where the capital X's represent integers.  Please see the examples below
 the option descriptions.  The square brackets are not part of the command
@@ -74,7 +86,7 @@ wordplay:              This is the name of the executable (under UNIX) after
 		       you have compiled the program.  Under other 
 		       environments, method of invocation may vary.
 
-"string to anagram" :  This should be seen to the program AS A SINGLE
+string:                This should be seen to the program AS A SINGLE
 		       ARGUMENT.  If you feel you must put spaces in the
 		       string, under UNIX, you will have to put backslashes
 		       in front of the spaces or just put the entire string
@@ -91,8 +103,7 @@ Other options:
       to generate a wordlist which can be piped or redirected.
       
       This option does not suppress error messages that are printed to 
-      stderr.  Finding zero anagrams is not considered an error, unless it
-      is due to some other abnormal error.
+      stderr.  Finding zero anagrams is not an error.
 
   l:  Print list of candidate words before anagramming.  This is the list of 
       words that can be spelled with the letters from the specified string,
@@ -117,7 +128,10 @@ Other options:
 
   d:  Limit number of words in anagrams to a maximum number.  
       Follow by an integer.  d3 means no anagrams should contain more
-      than 3 words.  d12 means limit anagrams to 12 words.
+      than 3 words.  d12 means limit anagrams to 12 words.  This is
+      currently the option that I recommend to limit output, since
+      an optimization has been added to speed execution in some cases
+      when this option is used.
 
   w:  Specify a word which should appear in all anagrams.  This is useful
       if you already have a word in mind that you want in the anagrams. 
@@ -161,7 +175,7 @@ wordplay persiangulf -ld3m10 -f /usr/dict/words
      Print the candidate words for the string "persiangulf".
      Print anagrams containing up to 3 words, without considering any
      words longer than 10 characters.  Usr the file "/usr/dict/words"
-     rather than "words700.txt".
+     rather than "words721.txt".
 
 (5)
 wordplay soylentgreen -n3w stolen -f w2     or
@@ -195,7 +209,7 @@ wordplay trymeout -v
     Anagram "trymeout" as usual, but in case vowel-free strings are in
     the wordlist, consider them as possible candidate words.
 
-(9)
+(9)  UNIX ONLY!
 cat wordlist1 wordlist2 wordlist3 | sort -u | wordplay trymeout -f -
 
     Anagram "trymeout" and read the wordlist from stdin, so that, in
@@ -219,12 +233,13 @@ The "w" option is used in the same manner.
 Notes:
 
 Limit the number of words to consider, if desired, using the n and m options,
-as well as the d option, to limit depth, when anagramming certain 
-time-consuming strings.
+or better yet, use the d option to limit depth, when anagramming certain 
+time-consuming strings.  The program is currently optimized to speed execution
+in some cases when the d option is used.
 
 Plurals and past tenses
 
-The words700.txt does not contain plural forms of nouns obtained by adding "s"
+The words721.txt does not contain plural forms of nouns obtained by adding "s"
 or "es".  It usually does not contain verb forms obtained by adding "ed" or
 "d", and it does not contain many adjective forms obtained by adding "y".
 If the string you are anagramming contains an "s", try anagramming the 
@@ -240,18 +255,19 @@ like "ATOMIC NUMBER" or "KNOW IT ALL" in your word list will be considered
 as a single word by the program!  If "ATOMIC" and "NUMBER" appear as 
 single words also, "ATOMIC NUMBER" will appear twice in the output, once
 as a one-word anagram and once as a two-word anagram.  This is not a flaw
-in the program.  The words700.txt word list does not contain "double words",
+in the program.  The words721.txt word list does not contain "double words",
 but other dictionaries, like web2/web2a, do contain such things.
 
-The "words700.txt" wordfile:
+The "words721.txt" wordfile:
 
-If no wordfile is specified, "words700.txt" is used.  It is highly 
-recommended that the "words700.txt" file distributed with the program be 
+If no wordfile is specified, "words721.txt" is used.  It is highly 
+recommended that the "words721.txt" file distributed with the program be 
 used, since many nonsense two and three-letter combinations that are not 
 words have been eliminated.  This makes the quality of the output slightly 
 better and speeds execution of the program a slight bit.  Any word list may 
 be used, as long as there is one word per line.  Feel free to create your 
-own custom word list and use it instead.
+own custom word list and use it instead.  The word list does not have to be 
+sorted in any particular way.
 
 ------------------------------------------------------------------------------
 Program development history:
@@ -263,14 +279,14 @@ had written "roll tide" and someone else had responded with "war eagle".
 (University of Alabama and University of Auburn rivalry).  Well, some people
 started rearranging the letters of the two scribbles and soon there was quite
 a long column of anagrams below each.  People then wrote other things, like
-"tomatoes" and "batse/gro" (a project name) and "boredom" and those got
-anagrammed by everyone.  I thought as I sat there one day, "How hard would it
-be to write a program to do that?".  One night, I decided to give it a try.
-On March 29, 1991, I tackled it.  I coded one little step at a time and got
-it working.  I anagrammed "Persian Gulf" and wrote 30 anagrams of it in that
-restroom stall.  I took the code and tried to run it under VMS.  I had to 
-change one line to make it work.  It also worked on a Stardent UNIX computer 
-after changing that same line.  
+"tomatoes" and "boredom" and those got anagrammed by everyone.  I thought as I 
+sat there one day, "How hard would it be to write a program to do that?".  
+One night, I decided to give it a try.  On March 29, 1991, I tackled it.  
+I coded one little step at a time and got it working.  I anagrammed 
+"Persian Gulf" and wrote 30 anagrams of it in that restroom stall.  I took 
+the code and tried to run it under VMS.  I had to change one line to make it 
+work.  It also worked on a Stardent UNIX computer after changing that same 
+line.  
 
 Version 1.00 was written in one night.  I sat down at my PC at home, and using
 Microsoft Fortran 5.0, coded it up.  It just read the words into an array, and 
@@ -494,7 +510,7 @@ Version 5.10
 
 April 11, 1994
 Newsgroup alt.anagrams created.  I thought, "I should tell everyone about my
-program and make it available".  I didnt have much of a documentation file,
+program and make it available".  I didn't have much of a documentation file,
 but I posted the information.  In the first 40 hours, after April 9 at 21:00, 
 60 people had taken the code!  I improved the readme file and added the 
 minimum and maximum candidate word restriction options back in.  They can
@@ -718,6 +734,14 @@ Bug fixes and improvements:
 4.  When the "starting word" specified with the "w" option is an anagram
     of the initial string, that "starting word" is printed as an anagram,
     instead of saying "No anagrams found".
+
+Version 7.21
+
+In the anagramr7 function, the current depth is subtracted from the
+maximum allowable depth and then multiplied by the length of the longest
+candidate word.  If this product is less than the length of the string
+passed into the function, then the case is treated as a dead end, causing
+the program to run faster in many cases when the "d" option is used.
 
 ------------------------------------------------------------------------------
 
