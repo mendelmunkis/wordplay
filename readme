@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 
-Wordplay Version 7.21     Evans A Criswell   09-11-95
+Wordplay Version 7.22     Evans A Criswell   03-20-96
 
 ------------------------------------------------------------------------------
 
@@ -742,6 +742,13 @@ maximum allowable depth and then multiplied by the length of the longest
 candidate word.  If this product is less than the length of the string
 passed into the function, then the case is treated as a dead end, causing
 the program to run faster in many cases when the "d" option is used.
+
+Version 7.22
+
+In a couple of places in the code, my malloc statements were not taking 
+into account the space needed to store the trailing NULL in a character 
+string.  This bug has rarely affected anyone, but I have now received two
+mail messages about it.  
 
 ------------------------------------------------------------------------------
 

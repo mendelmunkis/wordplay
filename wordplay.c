@@ -1,9 +1,13 @@
 /*
 
-Wordplay Version 7.21         09-11-95
+Wordplay Version 7.22         03-20-96
 
 Written by Evans A Criswell at the University of Alabama in Huntsville
 
+03-20-96 Fixed a small memory allocation problem.  In a couple of places,
+	 the amount allocated to hold character strings was not taking the
+	 space to store the null into account.  This bug has only affected
+	 a couple of people.  
 09-11-95 In the anagramr7 function, I check the product of the maximum
 	 "levels deep" remaining and the length of the longest candidate
 	 word.  If this product is less than the length of the string
@@ -99,6 +103,7 @@ versions were written in FORTRAN 77.
 
 Note:  There was no version 5.12.  It was called 5.20 instead.
 
+Version 7.22  03-20-96  Bug fix.
 Version 7.21  09-11-95  Speed increase.
 Version 7.20  08-21-94  Wordfile from stdin capability, bug fixes.
 Version 7.11  08-16-94  Speed increase.
@@ -233,7 +238,7 @@ int main (int argc, char *argv[])
   if (argc < 2)
   {
     fprintf (stderr, 
-	    "Wordplay Version 7.21  09-11-95, 1991   by Evans A Criswell\n");
+	    "Wordplay Version 7.22  03-20-96, 1991   by Evans A Criswell\n");
     fprintf (stderr, 
 	    "University of Alabama in Huntsville     criswell@cs.uah.edu\n\n");
     fprintf (stderr, "Usage:  ");
@@ -351,7 +356,7 @@ int main (int argc, char *argv[])
 
   if (silent == 0)
   {
-    printf ("Wordplay Version 7.21  09-11-95, 1991   by Evans A Criswell\n");
+    printf ("Wordplay Version 7.22  03-20-96, 1991   by Evans A Criswell\n");
     printf ("University of Alabama in Huntsville     criswell@cs.uah.edu\n\n");
   }
 
@@ -830,7 +835,7 @@ int main (int argc, char *argv[])
     }
 
     for (i = 0; i < MAX_ANAGRAM_WORDS; i++)
-      if ((accum[i] = (char *) malloc (longestlength * sizeof (char))) ==
+      if ((accum[i] = (char *) malloc ((longestlength + 1) * sizeof (char))) ==
 	  (char *) NULL)
       {
 	fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
@@ -861,7 +866,7 @@ int main (int argc, char *argv[])
     }
 
     for (i = 0; i < MAX_ANAGRAM_WORDS; i++)
-      if ((accum[i] = (char *) malloc (MAX_WORD_LENGTH * sizeof (char))) ==
+      if ((accum[i] = (char *) malloc ((MAX_WORD_LENGTH + 1) * sizeof (char))) ==
 	  (char *) NULL)
       {
 	fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
