@@ -1,0 +1,727 @@
+------------------------------------------------------------------------------
+
+Wordplay Version 7.20     Evans A Criswell   08-21-94
+
+------------------------------------------------------------------------------
+
+This program was written for fun and is free.  Distribute it as you please,
+but please distribute the entire package, with the original words700.txt and 
+the readme file.  If you modify the code, please mention my name in it as the
+original author.  Please send me a copy of improvements you make, because I
+may include them in a future version.
+
+I may be contacted by email at criswell@cs.uah.edu
+
+Evans A Criswell
+Research Associate
+Computer Science Department
+University of Alabama in Huntsville
+Huntsville, AL  35899
+
+------------------------------------------------------------------------------
+
+Wordplay is an anagram finder.  What is an anagram?  Well, let's turn to
+Merriam-Webster's Collegiate Dictionary, Tenth Edition:
+
+Definition:  anagram:  a word or phrase made by transposing the letters
+		       of another word or phrase.  
+
+Each letter in the anagram must appear in the same frequency as in the 
+original string.
+
+For example, the letters in the word "stop" can be rearranged to spell
+"tops" or "pots" or "sotp".  "sotp" is not a word and is not of interest
+when generating anagrams.  "stop" has four letters, so there are 24 ways
+to rearrange its letters.  However, very few of the rearrangements actually
+spell words.  
+
+Wordplay, by using a list of words, takes a specified string of letters and 
+uses the list of words to find anagrams of the string.  
+
+------------------------------------------------------------------------------
+
+Compiling the program:
+
+Under UNIX, issue the command
+
+  cc -o wordplay wordplay.c
+
+This assumes your native "cc" is an ANSI compiler.  If not, it WILL NOT WORK.
+If you have gcc, use it instead:
+
+  gcc -o wordplay wordplay.c
+
+Feel free to use optimization options!  They do make a significant difference
+with some compilers.
+
+-----------------------------------------------------------------------------
+
+Usage:
+
+IMPORTANT!!!!  The options have changed significantly since version 6.00!!!
+
+To use the program, invoke the program with a combination of options that
+make sense.  Here is the format:
+
+     wordplay "string to anagram" [-slxavnXmXdX] [-w word] [-f wordfile]
+
+where the capital X's represent integers.  Please see the examples below
+the option descriptions.  The square brackets are not part of the command
+line.  They simply are used to show that the options they surround are
+optional.
+
+wordplay:              This is the name of the executable (under UNIX) after 
+		       you have compiled the program.  Under other 
+		       environments, method of invocation may vary.
+
+"string to anagram" :  This should be seen to the program AS A SINGLE
+		       ARGUMENT.  If you feel you must put spaces in the
+		       string, under UNIX, you will have to put backslashes
+		       in front of the spaces or just put the entire string
+		       in double quotes.  Just leave the spaces out because
+		       the program throws them out anyway.  Under environments
+		       other than UNIX, you may be forced to omit them anyway,
+		       like under MS-DOS or OS/2 .
+
+Other options:
+
+  s:  Silent operation.  If this option is used, the header and line
+      numbers are not printed.  This is useful if you want the output to
+      contain only the anagrams.  Use this option with the l (and x) option
+      to generate a wordlist which can be piped or redirected.
+      
+      This option does not suppress error messages that are printed to 
+      stderr.  Finding zero anagrams is not considered an error, unless it
+      is due to some other abnormal error.
+
+  l:  Print list of candidate words before anagramming.  This is the list of 
+      words that can be spelled with the letters from the specified string,
+      with no letters being used more often that they appear in the input
+      string.
+
+  x:  Do not perform anagramming.  Use with l if you just want the 
+      candidate word list without anagrams.
+
+  a:  Allow anagrams containing two or more occurrences of a word.
+
+  v:  Consider strings with no vowels as candidate words and do not give
+      up when there are no vowels remaining after extractions.
+
+  m:  Limit candidate word length to a maximum number of letters.
+      Follow by an integer.  m12 means limit words to 12 letters.
+      m5 means limit them to 5 letters.
+
+  n:  Limit candidate word length to a minimum number of letters.
+      Follow by an integer.  n2 means limit words to 2 letters.
+      n11 means limit them to 11 letters.
+
+  d:  Limit number of words in anagrams to a maximum number.  
+      Follow by an integer.  d3 means no anagrams should contain more
+      than 3 words.  d12 means limit anagrams to 12 words.
+
+  w:  Specify a word which should appear in all anagrams.  This is useful
+      if you already have a word in mind that you want in the anagrams. 
+      This option should be specified at the end of the command, followed
+      by a space and the word to use.
+
+  f:  Specify which word list to use.  See example!  This option should
+      be specified at the end of the command, followed by a space and the 
+      alternate wordfile name.  This is useful if you have other word lists
+      to try or if you are interested in making your own customized word
+      list.
+
+      New feature:  Use a hyphen as the filename if the wordlist should
+      be read from stdin. 
+
+
+Examples of usage:
+
+(1)
+wordplay persiangulf 
+
+     Anagram the string "persiangulf" .
+
+(2)
+wordplay anagramming -lx
+
+     Print the list of words from the wordlist that can be spelled by using
+     the letters from the word "anagramming".  A letter may not be used more
+     often than the number of times it occurs in the word "anagramming".
+     No anagrams are generated. 
+
+(3)
+wordplay tomservocrow -n3m8
+
+     Anagram the string "tomservocrow" .  Do not use words shorter than 
+     3 letters or longer than 8 letters.
+
+(4)
+wordplay persiangulf -ld3m10 -f /usr/dict/words
+
+     Print the candidate words for the string "persiangulf".
+     Print anagrams containing up to 3 words, without considering any
+     words longer than 10 characters.  Usr the file "/usr/dict/words"
+     rather than "words700.txt".
+
+(5)
+wordplay soylentgreen -n3w stolen -f w2     or
+wordplay soylentgreen -n3 -w stolen -f w2   or
+wordplay soylentgreen -n3f w2 -w stolen     or
+wordplay soylentgreen -n3 -f w2 -w stolen   (get the idea?)
+
+     Print anagrams of "soylentgreen" containing the word "stolen" and
+     use the file "w2" as the wordlist file.  Discard candidate words 
+     shorter than 3 characters.
+
+(6)
+wordplay university -slx
+
+     Print the candidate word list for the string "university".  The
+     output will consist of just the words.  This output is more useful
+     for redirecting to a file or for piping to another program.
+
+(7)
+wordplay trymeout -s
+
+    Anagram the string "trymeout" and print the anagrams with no line
+    numbers.  The header will not be printed.  This is useful for piping
+    the output to another process (or saving it to a file to be used
+    by another program) without having to parse the output to remove the
+    numbers and header.
+
+(8)
+wordplay trymeout -v
+
+    Anagram "trymeout" as usual, but in case vowel-free strings are in
+    the wordlist, consider them as possible candidate words.
+
+(9)
+cat wordlist1 wordlist2 wordlist3 | sort -u | wordplay trymeout -f -
+
+    Anagram "trymeout" and read the wordlist from stdin, so that, in
+    this case, under UNIX, the three wordlists "wordlist1", "wordlist2",
+    and "wordlist3" will be concatenated and piped into wordplay as
+    the wordlist.  The "sort -u" is there to remove duplicate words
+    from the combined wordlist.
+
+------------------------------------------------------------------------------
+
+Using the "f" option to specify a word file:
+
+If the option specifiers are combined, as in "an7m7d5f" or "d3n5f", the f 
+should come last, followed by a space and the word list file, as shown in 
+example number 4 above.
+
+The "w" option is used in the same manner.
+
+------------------------------------------------------------------------------
+
+Notes:
+
+Limit the number of words to consider, if desired, using the n and m options,
+as well as the d option, to limit depth, when anagramming certain 
+time-consuming strings.
+
+Plurals and past tenses
+
+The words700.txt does not contain plural forms of nouns obtained by adding "s"
+or "es".  It usually does not contain verb forms obtained by adding "ed" or
+"d", and it does not contain many adjective forms obtained by adding "y".
+If the string you are anagramming contains an "s", try anagramming the 
+string without the "s" and add an "s" in the output.  This trick may also
+work effectively with "d" and "y".
+
+Apostrophes, hyphens, and other non-alphabetics
+
+All non-alphabetic characters in a word are preserved, INCLUDING BLANKS!!!
+If you have a dictionary with words like "DON'T", "ONE-EYED", and
+"ATOMIC NUMBER", each will be correctly processed.  Note that words
+like "ATOMIC NUMBER" or "KNOW IT ALL" in your word list will be considered
+as a single word by the program!  If "ATOMIC" and "NUMBER" appear as 
+single words also, "ATOMIC NUMBER" will appear twice in the output, once
+as a one-word anagram and once as a two-word anagram.  This is not a flaw
+in the program.  The words700.txt word list does not contain "double words",
+but other dictionaries, like web2/web2a, do contain such things.
+
+The "words700.txt" wordfile:
+
+If no wordfile is specified, "words700.txt" is used.  It is highly 
+recommended that the "words700.txt" file distributed with the program be 
+used, since many nonsense two and three-letter combinations that are not 
+words have been eliminated.  This makes the quality of the output slightly 
+better and speeds execution of the program a slight bit.  Any word list may 
+be used, as long as there is one word per line.  Feel free to create your 
+own custom word list and use it instead.
+
+------------------------------------------------------------------------------
+Program development history:
+
+Version 1.00
+
+In a restroom in the building I used to work, in the last stall, one person
+had written "roll tide" and someone else had responded with "war eagle".
+(University of Alabama and University of Auburn rivalry).  Well, some people
+started rearranging the letters of the two scribbles and soon there was quite
+a long column of anagrams below each.  People then wrote other things, like
+"tomatoes" and "batse/gro" (a project name) and "boredom" and those got
+anagrammed by everyone.  I thought as I sat there one day, "How hard would it
+be to write a program to do that?".  One night, I decided to give it a try.
+On March 29, 1991, I tackled it.  I coded one little step at a time and got
+it working.  I anagrammed "Persian Gulf" and wrote 30 anagrams of it in that
+restroom stall.  I took the code and tried to run it under VMS.  I had to 
+change one line to make it work.  It also worked on a Stardent UNIX computer 
+after changing that same line.  
+
+Version 1.00 was written in one night.  I sat down at my PC at home, and using
+Microsoft Fortran 5.0, coded it up.  It just read the words into an array, and 
+prompted for strings to anagram or a "." to terminate.  Each time a string was
+entered, the number of occurrences of each letter was counted and stored in
+an array of size 26.  The word list was then filtered, with the result going
+to a second array.  Any word containing a letter that did not appear in the
+string being anagrammed was not copied over.  This eliminated many of the
+words in most cases.  
+
+Lengths of the words were checked while doing one and two word anagrams.
+If the length of a word was not equal to the length of the string being 
+anagrammed, there was no need to check it.  Likewise, with two-word anagrams,
+there was no need to check them if the sums of the lengths did not match the
+length of the string being anagrammed.
+
+This program did the job, but was quite slow.  
+
+Version 1.10
+
+I had two main thoughts in my head when I worked on the program again five
+days later on April 3, 1991.  First, it needed to run faster, and second,
+if the program takes a while to execute, it would be nice if it could give 
+an indication of how long the anagramming would take.
+
+The speed increase came from inserting a second word filter into the program.
+Basically, if a word contains more of a particular letter than the string
+being anagrammed, it can be tossed out.  Note than any word thrown out in
+pass one would be thrown out by this second pass, but since the second pass
+is much more "expensive" timewise to execute, the first pass was not changed.
+The second pass simply works on the list produced by pass one, and eliminates,
+on the average, one third to one half of the words remaining after pass one.
+The result of pass two is the list of words that can be spelled using the 
+letters of the string being anagrammed.  The result of the second word filter
+being inserted was an average three to four times faster execution.
+
+I inserted a loop similar to the loop the program executes while anagramming 
+and timed it when the program started to see how long it took on whatever 
+machine it was being run on to get a rough idea of the machine speed.  This 
+number, whatever it was, was multiplied by the square of the number of 
+candidate words remaining after filtering in order to produce an estimate.  
+This speed test only worked under OS/2, though.  Running the program on any 
+other system required commenting out that code.  
+
+A small but nice thing I did is automatically converted all letters in the
+user's input strings to upper case so the user wouldn't be forced to use all
+upper case.  Blanks were automatically stripped out of the user's string so
+that they wouldn't have to run things together.
+
+I decided at this point to go ahead and give the user some commands that
+could be run by using a "/" as the first character of the string.  Most were
+trivial to implement.  "VER" (print program version), "WORD" (print last
+string anagrammed), "HELP" (print commands available), "EXIT" (same as 
+entering a "." as the first character), and "LIST".  "LIST" printed the
+candidate word list after pass two.  Remember in elementary school where
+the teacher would write a word on the board and ask you to find as many
+words as you could that could be spelled using the word's letters?  That's
+what the "LIST" command provided.
+
+Version 1.11
+
+This version was written on April 11, 1991.
+
+An array containing the lengths of the filtered words was added to the
+program to keep from having to repeatedly recompute lengths of the words.
+The length-based optimizations from version 1.00 ran faster this way.
+
+Version 2.00
+
+One day after writing version 1.11, on April 12, 1991, I made a major
+upgrade.  I decided the program was running efficiently enough to 
+possibly handle three word anagrams.  I coded the three word anagram
+using basically the same technique I used for the two-word ones.  I
+checked to see if the lengths of the three words being tested added to
+the length of the string being anagrammed before testing the number of 
+letters, etc.  
+
+More commands and options were added in this version.  Since three word
+anagrams took a lot of time and produced lengthy output, I figured most
+of the time, users would not want to do the three word anagramming.  I
+decided to make various steps of the program options that could be enabled
+or disabled.  The steps that could be disabled or enabled independently
+were the pass two word filter, one word anagrams, two word anagrams, and
+three word anagrams.  The three word anagrams were disabled by default.
+The new commands were "DIS" and "ENA" to enable and disable options, along
+with "STAT", which showed the settings of various options.
+
+Version 2.10
+
+Only four days after writing version 2.00, I improved the program again
+(4-14-91) by adding the minimum and maximum candidate word length restriction
+options.  This allowed the user to specify that words shorter or longer than 
+a specified number of letters should not be considered as candidate words.
+This weeds out a lot of small words and speeds things up when anagramming 
+longer strings.  Obviously, if the length of the string being anagrammed
+is less than twice the minimum word length, no two word anagrams will be
+found.  Also, if the length of the string being anagrammed is more than 
+twice the the minimum word length, no two word anagrams will be found, so
+those checks were put in.  Similar checks were put in for the three word
+anagrams.  The "MIN" and "MAX" commands were the new commands added to
+allow the user specify minimum and maximum word lengths.
+
+Version 3.00
+
+The version 2.10 was satisfactory for quite a while (8 months).  
+On December 16, 1991, however, I upgraded it again, and to users of the
+program, except for the new version number "3.00", the program looked
+and behaved exactly the same way, except for a couple of things.  The output
+was no longer in alphabetical order and the program was faster, especially
+when doing three word anagrams.  Losing alphabetical order was a small
+price to pay for the substantial speed increase, which was accomplished by
+sorting the word list by word length, using the combsort algorithm from BYTE 
+magazine.  A reprint of the article describing combsort appears in the book 
+THE BEST OF BYTE.  Anyway, this was the second optimization.  Let me first
+describe the first optimization:
+
+After reading the user's string to anagram, the least and greatest letters
+occurring in the string were stored.  For example, if the user entered
+"boredom", then the minimum letter was 2 for "b" and the maximum was 
+18 for "r".  The array containing the numbers of occurrences for each letter
+of the alphabet was then processed into two "parallel arrays", called 
+nlasci and nlascl.  The arrays were created in such a way that, for example,
+if nlasci(1) was 4 and nlascl was 1, this meant there were was one "d" in the
+input string.  nlasci(2) being 9 and nlascl(2) being 4 would mean there were 4
+occurrences of "i" in the input string.  Note that the sizes of nlasci and
+nlascl never exceed 26 and the number of elements used in each is equal to
+the number of distinct letters in the input string.  For example, "boredom"
+contains 6 distinct characters, so the nlasci and nlascl arrays only contain
+6 entries each, with the empty slots in nlasci being filled with "-1" and
+empty slots in nlascl being filled with "0" .  Why create these arrays?
+Because the anagram procedure now has a list of which letters to check for
+equal numbers of occurrences instead of having to check all 26 letters of
+the alphabet every time!  A huge speed increase for shorter strings!
+
+Now back to sorting the word list by length.  I then created indexes into
+the sorted word list by length.  For example, the program now easily "knew"
+that words of length 7, for example, were in, say, elements 234 through 327
+of the candidate word array!  If I'm doing two word anagrams, and my first
+word to consider is 5 characters long, and my anagramming string is 11
+characters long, I can obviously scan the candidate words that are 6 
+characters in length and ignore the rest.  The indexes make that very easy.
+
+A change was make to the three-word anagram procedure.  It was faster to
+modify the two word anagram procedure a slight bit and concatenate the
+first two words being considered and call the modified two word anagram 
+procedure with two words consisting of the word1 + word2, and word3.
+
+Version 4.00
+
+I felt much more comfortable with C at this point, so I decided I'd try
+to tackle porting the program.  On April 30, 1993, in one night, I ported
+everything except the three word anagrams and a lot of the interactive
+options.  The new version was command-line based instead of interactive 
+and was more typical of a UNIX-style program.  About a month later, on
+May 25, I added the three word anagram code and got the program in a 
+fairly stable state so it could be distributed.  Actually, I don't think
+I ever took the word "Beta" out of it.  :-)  The program printed its
+command line parameters (debug statements).  That was never taken out.
+The C version was invoked as follows:
+
+wordplay string_to_anagram -123l -f word_file
+
+The 1, 2, 3, and l options were obviously the old one, two, three, and word
+list flags.  The new option was allowing the user to specify an alternate
+word file on the command line.  This program was a straight port, for the 
+most part, of the FORTRAN code as far as the anagramming went.  Since I
+had a 32-bit C compiler on my 386/33 system, this program ran much faster
+than the FORTRAN version using the same algorithms.
+
+Version 5.00
+
+Sick of being limited to three word anagrams, since C supports recursion,
+I added a recursive algorithm that almost makes the old iterative routines
+obsolete.  They're still there, though.  The "r" option tells wordplay
+to use the recursive algorithm, which basically works as follows 
+very much oversimplified).  Read the actual code for details.
+
+int recursive_anagram (string, accumulation, level):
+{
+  if no vowels in string, decrement level, return   (dead end)
+  go through list of important candidate words:  for each:
+  {
+    attempt to extract the word from the string passed into the function.
+    if extraction not possible, continue (try next word)
+    if extraction was perfect (left no letters), print the anagram
+		       (accumulation plus the word), then decrement the level, 
+		       return 
+    if extraction was successful, but left some letters, add the word to
+		       accumulation, increment level, and call the function
+		       with args (<<whatever is left after extraction>>,
+				  accumulation, and level)
+  }
+  if no extractions were a success, decrement level and return.
+  decrement level and return anyway, since we're at the end.  :-)
+}
+  
+Boy, that was a cheesy description.
+
+Version 5.01
+
+Later during the night of writing 5.00, I realized that I should eliminate
+strings of anagrams like "A A ..." or "A I I ... " or "I I ..." or "THE THE .."
+because such anagrams are seldom of interest.  Taking them out makes the
+program run more quickly and slightly increases the quality of the output.
+The check was easy to put into place, so I did it.  I had already given the
+code to some friends as 5.00 without that check, so I called this one 5.01.
+
+Version 5.02
+
+November 30, 1993
+Thanksgiving!  While anagramming "Thanksgiving", I found a bug that both 
+5.00 and 5.01 had.  Those versions would occasionally miss some anagrams.  
+It had to do with the fact that if there were no words in the word list with 
+length equal to the string being passed to the recursive anagram function, no 
+words would be used for extraction in the loop.  The bug was fixed my 
+adjusting a variable called "max_important length" by decrementing it until
+there are some words in the word list having that length or until it reaches
+zero, of course.
+
+Version 5.10
+
+April 11, 1994
+Newsgroup alt.anagrams created.  I thought, "I should tell everyone about my
+program and make it available".  I didnt have much of a documentation file,
+but I posted the information.  In the first 40 hours, after April 9 at 21:00, 
+60 people had taken the code!  I improved the readme file and added the 
+minimum and maximum candidate word restriction options back in.  They can
+really be of help when anagramming longer strings.
+
+Version 5.11
+
+On April 14, 1994, I rewrote the "extract" function, and did not really change
+the algorithm, but changed from using arrays and subscripts and integer loop
+control variables to using pointers and pointer loop control variables.  
+Depending on the compiler, this change may or not speed execution of the 
+program.  My results so far have ranged from no speed increase to a quite
+dramatic 40 percent reduction in execution time, just by using different 
+compilers.  
+
+Version 5.20
+
+April 17, 1994
+
+Note:  There was no version 5.12.  It became 5.20 before release.
+
+Since the program was ported to C, it only anagrams one string per run.
+Storing the entire wordfile into an array is unnecessary and takes a lot 
+of memory.  The reason I left it in there so long is because I felt 
+eventually I would have the program fixed somehow so it would anagram
+more than one string per run.  I changed my mind since anagramming a new
+string requires going back through the entire word list to make a new
+candidate word list.  The extract routine I originally added in version
+5.00 for use by the recursive anagram procedure, I realized, could be used
+to eliminate unnecessary words just as well as the pass1 and pass2 filters
+I had been using before.  I made that change and applied it to the words
+as they were being read in, directly storing them in the words2 array.
+The "words" array was removed from the program.  Now, if MAX_WORDS is set
+reasonable low enough, the program might run under MS-DOS without much
+work.  The program now starts much more quickly and uses less memory.
+It is only storing the candidate words and associated information.
+
+Version 5.21
+
+April 21, 1994
+Bug fixes:
+
+Ron Gregory found a simple fencepost error in the one-word iterative
+anagramming.  When porting from FORTRAN to C in version 4.00, the error
+was made and it was not discovered until a year later!  When using the
+indexes into the word list which say "the words of a particular length
+are in elements x through y of the candidate word list (the words2 array),
+the loop needs to go from x to and including y.  I used a less than instead
+of a less than or equal to in the for statement, stopping one short and
+missing the last word.  When doing one-word anagrams of a single word, the
+last word in the list is usually always that word, so the most obvious one
+was getting missed!  Thanks Ron!  I fixed a similar problem in the
+recursive algorithm, except it was caused by a decrement of a variable
+and a return appearing where I should have had a continue in one of the
+cases.
+
+However, I discovered a much worse bug, in a way, when I tested the program
+with a different wordfile.  I discovered that if the words were lowercase,
+it would not be processed correctly.  This problem came in with version
+5.20 with its new read routine.  I apologize for that one.  
+
+Yet another bad bug.  Try wordplay aiai -r .  It blows up any wordplay
+5.xx up to 5.20 .  Fewer candidate words than recursive anagramr calls
+caused that one.  Solution:  place a #define MAX_ANAGRAM_WORDS at the
+top of the program that the user can increase to suit his needs.  Going
+deeper than that value crashes the program.  The number of candidate words
+was the value previously used, which is too small when anagramming strings
+like "catcatcatcatcatcatcatcat" or "aiai".  Another one fixed!
+
+Version 5.22
+
+April 25, 1994
+No bug fixes.  Just a speedup.  If the string returned by exts has 
+character zero as the first character, go ahead and continue (try next
+word) instead of going through the remaining body of the for loop.  Duh.
+
+Version 5.23
+
+May 13, 1994
+A tiny bug fix.  The statement
+while ((wordsn[curpos] == curlen) && (curpos < ncount)) curpos++;
+should keep curpos within bounds.  curpos does get incremented to the
+value of ncount however, in some cases.  Evaluating wordsn[curpos]
+with curpos == ncount could cause a crash, since wordsn is of size
+ncount (max valid subscript = ncount - 1).
+
+Version 5.24
+
+May 16, 1994
+Anu Garg at Case Western Reserve University, Cleveland OH found that, on
+his machine, if there are no candidate words loaded, the program prints
+an error message about malloc() returning NULL.  Evidently, there are some
+versions of malloc() that do not like being passed zero as the amount to
+allocate and return a NULL pointer if they do.  This has never caused a
+problem or an error on any C compiler I've used, but at the end of the
+word loading/filtering routine, I now check for zero candidate words and
+exit with a different error message.
+
+Version 6.00
+
+On May 16, 1994, I decided to try a new approach that I previously had
+tried to work into the program without much of a speed increase.  This
+time, though, I did it more thoroughly.  I made a second copy of the
+words2 array (wordss), and sorted the characters of each word 
+alphabetically.  I experimented with this idea a long time ago in one
+of the old FORTRAN versions, but never went through with it.  I then
+sorted this second list in alphabetical order, maintaining a pointer
+to the associated words in the words2 array as I sorted.  I then created
+indexes into this new array by first letter as I did earlier with lengths in
+the words2 array.  I then made some modifications to the recursive procedure 
+to take advantage of this new indexing scheme.  It was much faster.  I had
+seen several other public domain anagram programs that seemed much faster
+then mine, and they seemed to be using an algorithm nearly identical in
+functionality to mine.  I finally realized that indexing by least letter
+can possible divide the word list into 26 parts, which are each indexed.
+Doing it the version 5 way, by length, since the average word length is 
+7 characters, with few words longer than, say, 10 characters, would divide
+the word list into only a dozen parts or less in many cases.  Dividing the
+list into finer parts was not the only speed increase.  The new algorithm
+should not generate all permutations of a given anagram.  This means far
+fewer operations.  This was one of the main requests from some of the local
+wordplay users, "Can you get rid of the duplicates?".  I am not sure if
+100 percent of the duplicates are removed in all cases, though, but it seems
+to get nearly all of them.  It is much faster, also.
+
+Version 7.00    5-26-94
+
+All redundant permutations are eliminated by not trying any words having 
+keys less than the current key we're dealing with at the current level.
+Also, the user can now specify whether anagrams containing more than one
+occurrence of a given word are acceptable.  This option is more important
+now that only one permutation of each anagram is printed.  The recursive
+algorithm is now used for everything, and the "1", "2", "3", "o", and "r"
+options were removed.  Anagram depth (number of words) is now specified
+with the "d" option ("d3" for three words maximum).  The major version 
+number was changed because of the command line option changes.  
+The "r" is no longer required.  The "x" option is used to turn off 
+anagramming, if all you want to do is generate a word list with the "l"
+option.  A word may be specified with the "w" option to start anagrams, if
+you have a word in mind that you want the anagrams to contain.  Dictionary
+words containing apostrophes, hyphens, or other non-alphabetics retain
+their internal punctuation when displayed, but only the alphabetic characters
+are significant when processing anagrams.  "DON'T" = "DONT", "ONE-EYED" =
+"ONEEYED", "KANSAS CITY" = "KANSASCITY", and is processed as a single word.
+
+Version 7.01    6-3-94
+
+A user at io.com could not get wordplay to work.  It would load the words 
+and not generate any anagrams.  The uppercase conversion was not working.
+For the toupper macro to work properly on BSD/386 (their operating system),
+the ctypes.h file needed to be included.  That's all.  Nothing more.  It
+should be included everywhere, though.  BSD/386 is the only environment
+where that omission has caused a problem, though.
+
+Version 7.02     7-14-94
+
+A user, Ulf Lunde, suggested a mode of operation where only the anagrams
+are output, with no header, line numbers, or other messages, so they
+could be piped or redirected without having to filter anything.  I added
+the "s" option to accomplish that.  Adding this option to any command 
+simply turns off numbering of output and turns off the header.  If used
+with the "l" and "x" options (as in -slx), a word list can be generated 
+that is directly useful.  I had thought of this option before, but never
+got around to doing it until a user actually requested it.
+
+Version 7.10   08-14-94
+
+Wordplay was up until now, a serious memory hog!  Now, I've made several
+significant changes to reduce the memory usage.  I allocate one contiguous
+block to store the words (and another for the keys).  The word block is
+reallocated (using realloc()) to increase its size dynamically as more and
+more words are read in.  That way, it does not need to be made a "maximum"
+size that is big enough to handle the largest dictionary.  It can now start
+small and grow as needed.  The vowel index arrays were not being used, so
+I deleted them, and their associated code.  The word length indexes (the
+ones that say "words of length i are found in positions a through b" are
+allocated to be as big as the maximum word length (plus one), instead of
+MAX_WORD_LENGTH.
+
+After making these changes, I brought the code to an MS-DOS machine and
+it compiled under Turbo C ON THE FIRST TRY!!!  It ran fine, unless I tried
+to anagram something that required storing too many candidate words.
+
+Version 7.11
+
+Thanks to Dan Ingalls at Interval Research (interval.com) for a suggestion!
+Create integer masks representing the occurring letters in each word:
+
+33222222222211111111110000000000    Bit of integer (tens digit)
+10987654321098765432109876543210    Bit of integer (ones digit)
+......ZYXWVUTSRQPONMLKJIHGFEDCBA    Letter positions  (only 26 bits used)
+
+Example:  intmask ("ACE") is 00000000000000000000000000010101 = 21 decimal
+
+Before the main loop in anagramr7, the intmask of "s" is computed and 
+stored (in "s_mask") and inside the loop, the first thing that is
+checked is  "if ((s_mask | wordsmasks[i]) != s_mask)"  skip the rest of
+the loop body on this iteration of the loop.
+
+Version 7.20
+
+Bug fixes and improvements:
+
+1.  The "4" bug.  :-)
+    Numbers are no longer treated as punctuation.  Strings with digits
+    are no longer considered equivalent to the string without the digits.
+    That is, "4th" no longer is equivalent to "th".
+
+2.  Wordplay now is capable of taking the wordlist from stdin by using
+    a hyphen as the input file name.  For those of you familiar with
+    the "tar" command, it'll come natural to you.  This will allow users
+    to break their wordfile into several parts, one with common words,
+    one with places, one with people's names, and concatenate the 
+    desired ones together and pipe the combination into wordplay.
+
+3.  An option to override the vowel-checking is available.  When this
+    option is used, the "anagramr7" routine will continue trying to
+    anagram, even when there are no vowels left in the string after
+    an extraction.
+
+4.  When the "starting word" specified with the "w" option is an anagram
+    of the initial string, that "starting word" is printed as an anagram,
+    instead of saying "No anagrams found".
+
+------------------------------------------------------------------------------
+
+HAVE FUN !!!
+
+------------------------------------------------------------------------------
+
