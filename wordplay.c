@@ -178,8 +178,11 @@ int     vowelcheck;
 
 int    *lindx1; 
 int    *lindx2;
-int     findx1[26];
-int     findx2[26];
+int     findx1[30];
+int     findx2[30];
+int	findx12 = 30;
+
+char    pristineinitword[MAX_WORD_LENGTH];
 
 int main (int argc, char *argv[])
 {
@@ -382,8 +385,12 @@ int main (int argc, char *argv[])
   }
 
 /* Remove non-alphabetic characters from initword */
-
+  strcpy (pristineinitword, initword);
   strcpy (tempword, alphabetic (initword));
+  if(strlen(initword) != strlen(alphabetic (initword)))
+   {
+   if (silent == 0) printf("Warning: Characters that are not part of the english alphabet have been removed.\n");
+   }
   strcpy (initword, tempword);
 
   ilength = (int) strlen (initword);
@@ -538,7 +545,11 @@ int main (int argc, char *argv[])
   j = 1;
   for (i = 0; i < w2size; i++)
     if (j < ncount)
-      if (words2mem[i] == '\0') words2[j++] = words2mem + i + 1;
+      if ( (words2mem[i] == '\0') &&
+         ( (strlen(words2mem + i + 1)) == strlen(alphabetic(words2mem + i + 1)) ) )
+     {
+        words2[j++] = words2mem + i + 1;
+     }
 
 
   if (silent == 0) printf ("\n%d words loaded (%d byte block).  " 
@@ -778,7 +789,7 @@ int main (int argc, char *argv[])
   printf ("Beginning creation of first letter indexes.\n");
 */
 
-  for (i = 0; i < 26; i++)
+  for (i = 0; i < findx12; i++)
   {
     findx1[i] = -1;
     findx2[i] = -2;
