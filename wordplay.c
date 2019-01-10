@@ -474,9 +474,9 @@ int main (int argc, char *argv[])
   }
   else 
   {
+    fileinput = 1;
     if ((word_file_ptr = fopen (word_file_name, "r")) == NULL)
     {
-      fileinput = 1;
       fprintf (stderr, "Error opening word file.\n");
       return (-1);
     }
