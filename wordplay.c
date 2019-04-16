@@ -173,6 +173,7 @@ int     adjacentdups;
 int     specfirstword;
 int     maxdepthspec;
 int     silent;
+int     input;
 int     max_depth;
 int     vowelcheck;
 
@@ -250,6 +251,7 @@ int main (int argc, char *argv[])
 		     "[-f word_file]\n\n");
     fprintf (stderr, "Capital X represents an integer.\n\n");
     fprintf (stderr, "s  = silent operation (no header or line numbers)\n");
+    fprintf (stderr, "i  = include input phrase in anagram list\n");
     fprintf (stderr, "l  = print candidate word list\n");
     fprintf (stderr, "x  = do not generate anagrams (useful with l option)\n");
     fprintf (stderr, "a  = multiple occurrences of a word in an anagram OK\n");
@@ -272,6 +274,7 @@ int main (int argc, char *argv[])
   firstwordspec = 0;
   specfirstword = 0;     /*  this is the permanent one */
   silent = 0;
+  input = 0;
   vowelcheck = 1;
   maxdepthspec = 0;
 
@@ -316,6 +319,8 @@ int main (int argc, char *argv[])
 		       break;
             case 's' : silent = 1;
 		       break;
+            case 'i' : input = 1;
+                       break;
             case 'v' : vowelcheck = 0;
 		       break;
             case 'w' : firstwordspec = 1;
@@ -944,6 +949,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
 {
   int i, j, extsuccess, icurlet, newminkey, s_mask;
   char exts[MAX_WORD_LENGTH];
+  char tempword[MAX_WORD_LENGTH+50];
 
 /*  Print arguments passed in for debugging purposes */
 
@@ -1023,11 +1029,15 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
 
     if (*exts == '\0')
     {
-      rec_anag_count++;
+      memset(tempword, '\0', sizeof(tempword));
       strcpy (accum[*level], words2ptrs[i]);
+      for (j = 0; j < *level; j++) {strcat (tempword, accum[j]); strcat(tempword, " ");}
+      strcat(tempword, words2ptrs[i]);
+      if ((input == 0) && !strcmp(tempword, pristineinitword))
+          continue;
+      rec_anag_count++;
       if (silent == 0) printf ("%6d.  ", rec_anag_count);
-      for (j = 0; j < *level; j++) printf ("%s ", accum[j]);
-      printf ("%s\n", words2ptrs[i]);
+      printf ("%s\n", tempword);
       extsuccess = 1;
       continue;
     }
