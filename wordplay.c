@@ -144,7 +144,7 @@ Version 1.00  03-29-91  One and two word anagrams
 #define min(A, B) ((A) < (B) ? (A) : (B))
 
 #define DEFAULT_WORD_FILE "words721.txt"
-#define WORDBLOCKSIZE 4096
+#define WORDBLOCKSIZE 16384
 #define MAX_WORD_LENGTH 128
 #define SAFETY_ZONE MAX_WORD_LENGTH + 1
 #define MAX_ANAGRAM_WORDS 32
