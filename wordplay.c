@@ -1,140 +1,22 @@
 /*
+parts released to public domain by Evans Criswell
+copyright 2016 Logan Rosen, David William Richmond Jones
+copyright 2017 Innocent De Marchi
+copyright 2019 Moshe Piekarski
 
-Wordplay Version 7.22         03-20-96
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Written by Evans A Criswell at the University of Alabama in Huntsville
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-03-20-96 Fixed a small memory allocation problem.  In a couple of places,
-	 the amount allocated to hold character strings was not taking the
-	 space to store the null into account.  This bug has only affected
-	 a couple of people.  
-09-11-95 In the anagramr7 function, I check the product of the maximum
-	 "levels deep" remaining and the length of the longest candidate
-	 word.  If this product is less than the length of the string
-	 passed in, a "dead end" condition exists.  This makes the program
-	 run significantly faster for longer strings if the maximum
-	 depth option is used.
-08-21-94 Added "wordfile from stdin" option using "-f -"  
-	 Fixed "4" bug.  Digits in a string disqualify the string.
-	 Vowel-check override option added.
-	 Starting word ("w" option) checked to see if it's an anagram
-	 of the initial string.
-08-16-94 Used integer masks representing which letters appear in each
-	 word, allowing extraction checking to be checked quickly for
-	 failure in the anagramr7 routine.  Result:  the program has
-	 been 4 to 5 times faster.
-08-14-94 Made the program much more memory efficient.  Instead of calling
-	 malloc for each word in the candidate word list and in the key
-	 list, a contiguous block of memory was allocated to hold the
-	 words.  The block is realloc'ed if it needs to be increased as
-	 the words are read in.  After the words are packed into the
-	 block, the pointers are allocated and are pointed to the
-	 appropriate places (beginnings of words) in the block, so the
-	 rest of the program works with no modification.  Two gigantic
-	 arrays that weren't being used were eliminated.  The word length
-	 index arrays are now made to be the size of the longest word 
-	 instead of MAX_WORDS.  In fact, MAX_WORDS is now obsolete.
-07-14-94 Added "silent" option.
-06-03-94 Added "#include <ctypes.h>" so it would work on BSD/386 .  Thanks
-         to mcintyre@io.com (James Michael Stewart) for reporting the bug.
-05-26-94 Fixed command-line parsing bug.
-05-25-94 Eliminated redundant permutations.  Added option to specify a
-	 word to appear in anagrams.  Added maximum depth option (number
-	 of words, maximum, to appear in an anagram).  
-05-24-94 Added option so user could specify whether to allow anagrams
-	 with adjacent duplicate words like "A A" or "DOG DOG".
-05-16-94 Made a second copy of the word list and sorted each word's
-	 letters alphabetically and sorted this list of keys alphabetically.
-	 Modified the recursive algorithm to use the new index. (Ver 6.00)
-05-16-94 Another little bug fix.  Someone found that, on their machine,
-	 if there are no candidate words loaded for the string being 
-         anagrammed, it causes an error when malloc gets passed a zero
-         value for the amount to allocate.
-05-13-94 Tiny bug fix.  Just a small bug that never actually caused a
-	 crash, but very well could have if it had wanted to.  :-)
-04-25-94 Speed increase.  If exts indicates extraction was impossible,
-	 continue (try next word) instead of executing rest of loop body.
-04-21-91 Ron Gregory found a simple bug that has been in all the C
-	 versions (4.00 through 5.20).  In the one-word anagram
-	 section, a less than should have been a less than or equal to.
-	 A simple fencepost error.  The recursive anagram procedure had
-	 a similar problem.  A severe error was fixed in the version
-	 5.20 read routine which caused the program not to read the
-	 wordfile correctly if the entries were lowercase.
-04-17-94 Since this program, since it was ported to C, is command-line
-	 based, and only anagrams one string, it is not necessary to
-	 store the wordlist internally.  Unnecessary words are weeded
-	 out as the list is being read, using the "extract" routine.
-	 I can't believe I didn't think of using that routine for that
-	 purpose sooner.  That means pass1 and pass2 are obsolete.
-04-14-94 Changed the "extract" function to use pointers instead of
-	 array notation.  Under some compilers, this may nearly double
-	 the execution speed of the recursive anagram procedure.  On
-	 other compilers, it may make no difference at all.
-04-11-94 Added the minimum and maximum candidate word length options
-	 that were available in version 3.00 when the program was 
-	 interactive.  This helps to narrow down the word list and
-	 eliminate a lot of short words when anagramming long strings.
-11-30-93 Fixed a bug that Versions 5.00 and 5.01 had.  If there were
-	 no words in the candidate word list with the same length as
-	 the string passed to anagramr, the string passed to anagramr
-	 would not be anagrammed, causing many possible anagrams to
-	 be missed.
-11-08-93 Eliminated anagrams consisting of the same word occurring 
-         multiple times in a row, such "IS IS ...", since interesting
-         anagrams rarely contain such repetitions. (Version 5.01)
-11-08-93 Debug print statements commented and output cleaned up.
-         Version 5.00 completed.  It is currently not known which is
-	 always faster:  the old iterative 2 and 3 word anagram options
-	 or the recursive algorithm.  All the options from version 4.00
-	 are still in the program.
-11-07-93 Recursive algorithm working!
-11-03-93 Added code to index the candidate word list by number of vowels
-	 per word. (Beginning of 5.00 Alpha)  Never used in Version 5.00,
-	 but the code is there for future use.
-05-25-93 Three word anagramming capability ported and added.
-04-30-93 The big port from FORTRAN 77 to ANSI C.  No longer interactive.
-	 Instead, arguments are taken from the command line.
-	 (Everything working except three-word anagrams and all command
-	 line options not yet implemented)
-
-Version 4.00 is the first version to be implemented in C.  All previous
-versions were written in FORTRAN 77.
-
-Note:  There was no version 5.12.  It was called 5.20 instead.
-
-Version 7.22  03-20-96  Bug fix.
-Version 7.21  09-11-95  Speed increase.
-Version 7.20  08-21-94  Wordfile from stdin capability, bug fixes.
-Version 7.11  08-16-94  Speed increase.
-Version 7.10  08-14-94  Program uses much less memory.
-Version 7.02  07-14-94  Silent option.
-Version 7.01  06-03-94  Portability problem fixed.  ctypes.h needed .
-Version 7.00  05-26-94  Redundant permutations eliminated. Several refinements.
-Version 6.00  05-17-94  Huge speed increase.
-Version 5.24  05-16-94  Bug fix.
-Version 5.23  05-13-94  Tiny bug fix.
-Version 5.22  04-25-94  Speed increase.
-Version 5.21  04-21-94  Bug fixes.
-Version 5.20  04-17-94  Faster program initialization.  Far less memory used.
-Version 5.11  04-14-94  Slight speed increase with some compilers
-Version 5.10  04-11-94  Minimum, maximum candidate word length again
-			available.  (First time available in the C versions).
-Version 5.02  11-30-93  Bug fix. 
-Version 5.01  11-08-93  Optimization to eliminate multiple occurrences
-                        of a particular word in a row.
-Version 5.00  11-08-93  Recursive algorithm added  
-Version 4.00  04-30-93  Ported to C.  Became non-interactive and more
-			suitable for UNIX environment  
-Version 3.00  12-16-91  Indexing improvements.  Huge speed increase 
-Version 2.10  04-16-91  Options and help added 
-Version 2.00  04-12-91  Three word anagrams added 
-Version 1.11  04-11-91  Bug fixes and cleanups 
-Version 1.10  04-03-91  Pass 2 word filter added.  Huge speed increase. 
-Version 1.00  03-29-91  One and two word anagrams 
-
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -243,9 +125,7 @@ int main (int argc, char *argv[])
   if (argc < 2)
   {
     fprintf (stderr, 
-	    "Wordplay Version 7.22  03-20-96, 1991   by Evans A Criswell\n");
-    fprintf (stderr, 
-	    "University of Alabama in Huntsville     criswell@cs.uah.edu\n\n");
+	    "Wordplay Version 8  05-05-19 originally by Evans A Criswell\n");
     fprintf (stderr, "Usage:  ");
     fprintf (stderr, "wordplay string_to_anagram [-slxavnXmXdX] [-w word] "
 		     "[-f word_file]\n\n");

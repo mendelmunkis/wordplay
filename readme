@@ -1,24 +1,9 @@
 ------------------------------------------------------------------------------
 
-Wordplay Version 7.22     Evans A Criswell   03-20-96
+Wordplay Version 8                           05-05-19
 
 ------------------------------------------------------------------------------
 
-This program was written for fun and is free.  Distribute it as you please,
-but please distribute the entire package, with the original words721.txt and 
-the readme file.  If you modify the code, please mention my name in it as the
-original author.  Please send me a copy of improvements you make, because I
-may include them in a future version.
-
-I may be contacted by email at criswell@cs.uah.edu
-
-Evans A Criswell
-Research Associate
-Computer Science Department
-University of Alabama in Huntsville
-Huntsville, AL  35899
-
-------------------------------------------------------------------------------
 
 Wordplay is an anagram finder.  What is an anagram?  Well, let's turn to
 Merriam-Webster's Collegiate Dictionary, Tenth Edition:
@@ -46,28 +31,10 @@ satirical, or, occasionally, quite vulgar.
 
 Compiling the program:
 
-The only version of Wordplay that requires compilation is the UNIX version.
-The PC versions contain a pre-compiled executable since most people do not
-have 32-bit C compilers on their PC's.  The source is provided in all the
-packages.  I recommend the Gnu C compiler for DOS for compiling it.  There
-is a file in the DOS package that tells where to get the package, as well as
-how to set environment variables for the GO32 extender.
-
-Under UNIX, the program should be compiled with an ANSI C compiler.  Never
-fear; it's easy.  If you have the GNU C compiler, use it as follows:
-
-  gcc -O -o wordplay wordplay.c
-
-If you do not have "gcc", or for whatever reason, wish to use your machine's
-native compiler, use "cc" in place of "gcc", as follows:
-
-  cc -O -o wordplay wordplay.c
+Wordplay can be compiled by running.
+  make wordplay
 
 This assumes your native "cc" is an ANSI compiler.  If not, it WILL NOT WORK.
-If your compiler does not support the optimization option "-O", leave it out.
-
-Feel free to use optimization options that your particular compiler offers.
-They do make a significant difference with some compilers.
 -----------------------------------------------------------------------------
 
 Usage:
@@ -75,7 +42,7 @@ Usage:
 To use the program, simply invoke the program with a combination of options
 that make sense together.  Here is the format:
 
-     wordplay string [-slxavnXmXdX] [-w word] [-f wordfile]
+     wordplay string [-silxavnXmXdX] [-w word] [-f wordfile]
 
 where the capital X's represent integers.  Please see the examples below
 the option descriptions.  The square brackets are not part of the command
@@ -104,6 +71,9 @@ Other options:
       
       This option does not suppress error messages that are printed to 
       stderr.  Finding zero anagrams is not an error.
+
+  i:  Allow input string to appear in the list of anagrams. If this option is
+      omitted the input will not be counted as an anagram.
 
   l:  Print list of candidate words before anagramming.  This is the list of 
       words that can be spelled with the letters from the specified string,
@@ -256,7 +226,7 @@ as a single word by the program!  If "ATOMIC" and "NUMBER" appear as
 single words also, "ATOMIC NUMBER" will appear twice in the output, once
 as a one-word anagram and once as a two-word anagram.  This is not a flaw
 in the program.  The words721.txt word list does not contain "double words",
-but other dictionaries, like web2/web2a, do contain such things.
+but other dictionaries do contain such things.
 
 The "words721.txt" wordfile:
 
