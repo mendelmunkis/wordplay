@@ -2,7 +2,7 @@
 parts released to public domain by Evans Criswell
 copyright 2016 Logan Rosen, David William Richmond Jones
 copyright 2017 Innocent De Marchi
-copyright 2019 Moshe Piekarski
+copyright 2019 Moshe Piekarski, Clayton Smith
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
