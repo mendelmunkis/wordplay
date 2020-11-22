@@ -21,6 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <wchar.h>
+#include <wctype.h>
+#include <locale.h>
+
 
 #define max(A, B) ((A) > (B) ? (A) : (B))
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -32,23 +36,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAX_ANAGRAM_WORDS 32
 #define MAX_PATH_LENGTH 256
 
-char   *uppercase (char *s);
-char   *alphabetic (char *s);
-int     numvowels (char *s);
-void    anagramr7 (char *s, char **accum, int *minkey, int *level);
-char   *extract (char *s1, char *s2);
-int     intmask (char *s);
+wchar_t   *uppercase (wchar_t *s);
+wchar_t   *alphabetic (wchar_t *s);
+int     numvowels (wchar_t *s);
+void    anagramr7 (wchar_t *s, wchar_t **accum, int *minkey, int *level);
+wchar_t   *extract (wchar_t *s1, wchar_t *s2);
+int     intmask (wchar_t *s);
 
-char  **words2;  /* Candidate word index (pointers to the words) */
-char   *words2mem;  /* Memory block for candidate words  */
-char  **words2ptrs; /* For copying the word indexes */
-char  **wordss;    /* Keys */
-char   *keymem;     /* Memory block for keys */
+wchar_t  **words2;  /* Candidate word index (pointers to the words) */
+wchar_t   *words2mem;  /* Memory block for candidate words  */
+wchar_t  **words2ptrs; /* For copying the word indexes */
+wchar_t  **wordss;    /* Keys */
+wchar_t   *keymem;     /* Memory block for keys */
 int    *wordsn;    /* Lengths of each word in words2 */
 int    *wordmasks; /* Mask of which letters are contained in each word */
 int     ncount;    /* Number of candidate words */
 int     longestlength; /*  Length of longest word in words2 array */
-char    largestlet;
+wchar_t    largestlet;
 int     rec_anag_count;  /*  For recursive algorithm, keeps track of number
 			 of anagrams fond */
 int     adjacentdups;
@@ -65,30 +69,30 @@ int     findx1[30];
 int     findx2[30];
 int	findx12 = 30;
 
-char    pristineinitword[MAX_WORD_LENGTH];
+wchar_t    pristineinitword[MAX_WORD_LENGTH];
 
 int main (int argc, char *argv[])
 {
   FILE    *word_file_ptr;
-  char     buffer[MAX_WORD_LENGTH];
-  char     ubuffer[MAX_WORD_LENGTH]; 
-  char     alphbuffer[MAX_WORD_LENGTH];
-  char     initword[MAX_WORD_LENGTH];
-  char     remaininitword[MAX_WORD_LENGTH];
+  wchar_t     buffer[MAX_WORD_LENGTH];
+  wchar_t     ubuffer[MAX_WORD_LENGTH]; 
+  wchar_t     alphbuffer[MAX_WORD_LENGTH];
+  wchar_t     initword[MAX_WORD_LENGTH];
+  wchar_t     remaininitword[MAX_WORD_LENGTH];
   char     word_file_name[MAX_PATH_LENGTH];
-  char     first_word[MAX_WORD_LENGTH];
-  char     u_first_word[MAX_WORD_LENGTH];
-  char     tempword[MAX_WORD_LENGTH];
+  wchar_t     first_word[MAX_WORD_LENGTH];
+  wchar_t     u_first_word[MAX_WORD_LENGTH];
+  wchar_t     tempword[MAX_WORD_LENGTH];
   int      ilength;                           /* Length of initword */
   int      size; 
   int      gap;
   int      switches;
   int      iholdn;
-  char     chold;
-  char    *wholdptr;
+  wchar_t     chold;
+  wchar_t    *wholdptr;
   int      curlen;
   int      curpos; 
-  char     curlet; 
+  wchar_t     curlet; 
   int      icurlet;
   int      recursiveanag;
   int      listcandwords; 
@@ -99,17 +103,17 @@ int main (int argc, char *argv[])
   int      iarg;
   int      keyi; 
   int      keyj;
-  char   **accum;
+  wchar_t   **accum;
   int      level;
   int      minkey;
-  char     leftover[MAX_WORD_LENGTH];
+  wchar_t     leftover[MAX_WORD_LENGTH];
   int      w2size;
-  char    *w2memptr;
+  wchar_t    *w2memptr;
   int      w2offset;
-  char    *keymemptr;
+  wchar_t    *keymemptr;
   int      keyoffset;
-  char     no[3] = "no";
-  char     yes[4] = "yes";
+  wchar_t     no[3] = L"no";
+  wchar_t     yes[4] = L"yes";
   int      fileinput;
   int      hasnumber;
   int      i; 
@@ -145,6 +149,10 @@ int main (int argc, char *argv[])
 		     " to get started.\n");
     exit(-1);
   }
+  if (argc > 10)
+      exit(0);
+
+  setlocale(LC_ALL, "");
 
   strcpy (word_file_name, DEFAULT_WORD_FILE);
 
@@ -175,7 +183,7 @@ int main (int argc, char *argv[])
     }
     if (firstwordspec == 1)
     {
-      strcpy (first_word, argv[iarg]);
+      mbstowcs(first_word, argv[iarg], MAX_WORD_LENGTH);
       iarg++;
       firstwordspec = 0;
       continue;
@@ -238,7 +246,8 @@ int main (int argc, char *argv[])
     }
     else
     {
-      strcpy (initword, uppercase(argv[iarg]));
+      mbstowcs(tempword, argv[iarg], MAX_WORD_LENGTH);
+      wcscpy(initword, uppercase(tempword));
       iarg++;
     }
   }
@@ -262,23 +271,23 @@ int main (int argc, char *argv[])
     printf ("Minimum word length :  %d\n\n", mincwordlength);
 
     if (specfirstword)
-      printf ("First word          :  \"%s\"\n", first_word);
+      printf ("First word          :  \"%ls\"\n", first_word);
 
     printf ("Word list file      :  \"%s\"\n", word_file_name);
-    printf ("String to anagram   :  \"%s\"\n", initword);
+    printf ("String to anagram   :  \"%ls\"\n", initword);
     printf ("\n");
   }
 
 /* Remove non-alphabetic characters from initword */
-  strcpy (pristineinitword, initword);
-  strcpy (tempword, alphabetic (initword));
-  if(strlen(initword) != strlen(alphabetic (initword)))
+  wcscpy (pristineinitword, initword);
+  wcscpy (tempword, alphabetic (initword));
+  if(wcslen(initword) != wcslen(alphabetic (initword)))
    {
    if (silent == 0) printf("Warning: Characters that are not part of the english alphabet have been removed.\n");
    }
-  strcpy (initword, tempword);
+  wcscpy (initword, tempword);
 
-  ilength = (int) strlen (initword);
+  ilength = (int) wcslen (initword);
 
 /*  Sort characters of initword in increasing order  */
 
@@ -307,23 +316,23 @@ int main (int argc, char *argv[])
 
   if (specfirstword)
   {
-    strcpy (u_first_word, uppercase(first_word));
-    strcpy (remaininitword, extract (initword, u_first_word));
+    wcscpy (u_first_word, uppercase(first_word));
+    wcscpy (remaininitword, extract (initword, u_first_word));
     if (remaininitword[0] == '0')
     {
-      fprintf (stderr, "Specified first word \"%s\" cannot be extracted "
-		       "from initial string \"%s\"\n", u_first_word, initword);
+      fprintf (stderr, "Specified first word \"%ls\" cannot be extracted "
+		       "from initial string \"%ls\"\n", u_first_word, initword);
       exit (1);
     }
-    if (strlen (remaininitword) == 0)
+    if (wcslen (remaininitword) == 0)
     {
       if (silent == 0) 
       {
 	printf ("Anagrams found:\n");
-	printf ("     0.  %s\n", u_first_word);
+	printf ("     0.  %ls\n", u_first_word);
       }
       else
-	printf ("%s\n", u_first_word);
+	printf ("%ls\n", u_first_word);
       exit (0);
     }
 
@@ -333,7 +342,7 @@ int main (int argc, char *argv[])
 
   w2size = WORDBLOCKSIZE;
 
-  if ((words2mem = (char *) malloc (w2size * sizeof (char))) == (char *) NULL)
+  if ((words2mem = (wchar_t *) malloc (w2size * sizeof (wchar_t))) == (wchar_t *) NULL)
   {
     fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
     exit (-1);
@@ -367,42 +376,42 @@ int main (int argc, char *argv[])
   w2offset = 0;
   longestlength = 0;
 
-  while (fgets (buffer, MAX_WORD_LENGTH, word_file_ptr) != 
-	 (char *) NULL)
+  while (fgetws (buffer, MAX_WORD_LENGTH, word_file_ptr) != 
+	 (wchar_t *) NULL)
   {
-    j = (int) strlen (buffer) - 1;
+    j = (int) wcslen (buffer) - 1;
 
 /*  Replace the newline with a null  */
 
     buffer[j--] = '\0';
 
-    strcpy (alphbuffer, alphabetic (buffer));
+    wcscpy (alphbuffer, alphabetic (buffer));
 
-    if (((int) strlen (alphbuffer) < mincwordlength) || 
-	((int) strlen (alphbuffer) > maxcwordlength))
+    if (((int) wcslen (alphbuffer) < mincwordlength) || 
+	((int) wcslen (alphbuffer) > maxcwordlength))
       continue;
 
     hasnumber = 0;
-    for (j = 0; j < (int) strlen (buffer); j++)
+    for (j = 0; j < (int) wcslen (buffer); j++)
       if ((buffer[j] >= '0') && (buffer[j] <= '9')) hasnumber = 1;
 
     if (hasnumber == 1) continue;
 
-    strcpy (ubuffer, uppercase (alphbuffer));
-    strcpy (leftover, extract (initword, ubuffer));
+    wcscpy (ubuffer, uppercase (alphbuffer));
+    wcscpy (leftover, extract (initword, ubuffer));
     if (leftover[0] == '0') continue;
 
-    strcpy (w2memptr, uppercase(buffer));
-    w2memptr += strlen (buffer) + 1;
-    w2offset += strlen (buffer) + 1;
+    wcscpy (w2memptr, uppercase(buffer));
+    w2memptr += wcslen (buffer) + 1;
+    w2offset += wcslen (buffer) + 1;
 
-    if ((int) strlen (alphbuffer) > longestlength) 
-      longestlength = strlen (alphbuffer);
+    if ((int) wcslen (alphbuffer) > longestlength) 
+      longestlength = wcslen (alphbuffer);
 
     if ((w2size - w2offset) < SAFETY_ZONE) 
     {
        w2size += WORDBLOCKSIZE;
-       if ((words2mem = (char *) realloc (words2mem, w2size)) == (char *) NULL)
+       if ((words2mem = (wchar_t *) realloc (words2mem, w2size)) == (wchar_t *) NULL)
        {
          fprintf (stderr, "Out of memory.  realloc() returned NULL.\n");
          exit (-1);
@@ -418,7 +427,7 @@ int main (int argc, char *argv[])
 
 /* Malloc pointers for the word indexes */
 
-  if ((words2 = (char **) malloc (ncount * sizeof (char *))) == (char **) NULL)
+  if ((words2 = (wchar_t **) malloc (ncount * sizeof (wchar_t *))) == (wchar_t **) NULL)
   {
     fprintf (stderr, "Insufficient memory.  malloc() returned NULL.\n");
     exit (-1);
@@ -431,7 +440,7 @@ int main (int argc, char *argv[])
   for (i = 0; i < w2size; i++)
     if (j < ncount)
       if ( (words2mem[i] == '\0') &&
-         ( (strlen(words2mem + i + 1)) == strlen(alphabetic(words2mem + i + 1)) ) )
+         ( (wcslen(words2mem + i + 1)) == wcslen(alphabetic(words2mem + i + 1)) ) )
      {
         words2[j++] = words2mem + i + 1;
      }
@@ -458,14 +467,14 @@ int main (int argc, char *argv[])
 
   for (i = 0; i < ncount; i++) 
   {
-    strcpy (alphbuffer, alphabetic (words2[i]));
-    wordsn[i] = (int) strlen (alphbuffer); 
+    wcscpy (alphbuffer, alphabetic (words2[i]));
+    wordsn[i] = (int) wcslen (alphbuffer); 
   }
 
 /* Make a copy of the pointers from the words2 array (called words2ptrs) */
 
-  if ((words2ptrs = (char **) malloc (ncount * sizeof (char *))) == 
-      (char **) NULL)
+  if ((words2ptrs = (wchar_t **) malloc (ncount * sizeof (wchar_t *))) == 
+      (wchar_t **) NULL)
   {
     fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
     exit (-1);
@@ -478,7 +487,7 @@ int main (int argc, char *argv[])
 
 /*  Malloc the pointers for the list of keys */
 
-  if ((wordss = (char **) malloc (ncount * sizeof (char *))) == (char **) NULL)
+  if ((wordss = (wchar_t **) malloc (ncount * sizeof (wchar_t *))) == (wchar_t **) NULL)
   {
     fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
     exit (-1);
@@ -486,7 +495,7 @@ int main (int argc, char *argv[])
 
 /*  Make a copy of the block of memory containing the candidate word list */
 
-  if ((keymem = (char *) malloc (w2size * sizeof (char))) == (char *) NULL)
+  if ((keymem = (wchar_t *) malloc (w2size * sizeof (wchar_t))) == (wchar_t *) NULL)
   {
     fprintf (stderr, "Insufficient memory; malloc() returned NULL.\n");
     exit (-1);
@@ -500,9 +509,9 @@ int main (int argc, char *argv[])
 
   for (i = 0; i < ncount; i++)
   {
-    strcpy (alphbuffer, alphabetic (words2[i]));
-    strcpy (ubuffer, uppercase (alphbuffer));
-    strcpy (keymemptr, ubuffer);
+    wcscpy (alphbuffer, alphabetic (words2[i]));
+    wcscpy (ubuffer, uppercase (alphbuffer));
+    wcscpy (keymemptr, ubuffer);
     keymemptr += wordsn[i] + 1;
     keyoffset += wordsn[i] + 1;
 
@@ -522,7 +531,7 @@ int main (int argc, char *argv[])
 
   for (k = 0; k < ncount; k++)
   {
-    size = (int) strlen (wordss[k]);
+    size = (int) wcslen (wordss[k]);
     gap = size;
     do
     {
@@ -556,7 +565,7 @@ int main (int argc, char *argv[])
     for (i = 0; i < (size - gap); i++)
     {
       j = i + gap;
-      if (strcmp (wordss[i], wordss[j]) > 0)
+      if (wcscasecmp (wordss[i], wordss[j]) > 0)
       {
 	wholdptr = wordss[i];
 	wordss[i] = wordss[j];
@@ -606,9 +615,9 @@ int main (int argc, char *argv[])
     for (i = 0; i < ncount; i++) 
     {
       if (silent == 0) 
-	printf ("%6d.  %s\n", i, words2[i]);
+	printf ("%6d.  %ls\n", i, words2[i]);
       else
-	printf ("%s\n", words2[i]);
+	printf ("%ls\n", words2[i]);
     }
   }
 
@@ -724,16 +733,16 @@ int main (int argc, char *argv[])
   {
     if (silent == 0) printf ("\nAnagrams found:\n");
 
-    if ((accum = (char **) malloc (MAX_ANAGRAM_WORDS * sizeof (char *))) == 
-	(char **) NULL)
+    if ((accum = (wchar_t **) malloc (MAX_ANAGRAM_WORDS * sizeof (wchar_t *))) == 
+	(wchar_t **) NULL)
     {
       fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
       exit(-1);
     }
 
     for (i = 0; i < MAX_ANAGRAM_WORDS; i++)
-      if ((accum[i] = (char *) malloc ((longestlength + 1) * sizeof (char))) ==
-	  (char *) NULL)
+      if ((accum[i] = (wchar_t *) malloc ((longestlength + 1) * sizeof (wchar_t))) ==
+	  (wchar_t *) NULL)
       {
 	fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
 	exit(-1);
@@ -755,22 +764,22 @@ int main (int argc, char *argv[])
   {
     if (silent == 0) printf ("\nRecursive anagrams found:\n");
 
-    if ((accum = (char **) malloc (MAX_ANAGRAM_WORDS * sizeof (char *))) ==
-	(char **) NULL)
+    if ((accum = (wchar_t **) malloc (MAX_ANAGRAM_WORDS * sizeof (wchar_t *))) ==
+	(wchar_t **) NULL)
     {
       fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
       exit(-1);
     }
 
     for (i = 0; i < MAX_ANAGRAM_WORDS; i++)
-      if ((accum[i] = (char *) malloc ((MAX_WORD_LENGTH + 1) * sizeof (char))) ==
-	  (char *) NULL)
+      if ((accum[i] = (wchar_t *) malloc ((MAX_WORD_LENGTH + 1) * sizeof (wchar_t))) ==
+	  (wchar_t *) NULL)
       {
 	fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
 	exit(-1);
       }
 
-    strcpy (accum[0], u_first_word);
+    wcscpy (accum[0], u_first_word);
     level = 1;
     rec_anag_count = 0;
 
@@ -784,35 +793,35 @@ int main (int argc, char *argv[])
   return(0);
 }
 
-char *uppercase (char *s)
+wchar_t *uppercase (wchar_t *s)
 {
-  static char upcasestr[MAX_WORD_LENGTH + 1];
+  static wchar_t upcasestr[MAX_WORD_LENGTH + 1];
   int i;
 
-  for (i = 0; i < (int) strlen (s); i++) upcasestr[i] = toupper(s[i]);
+  for (i = 0; i < (int) wcslen (s); i++) upcasestr[i] = toupper(s[i]);
   upcasestr[i] = '\0';
 
   return (upcasestr);
 }
 
-char *alphabetic (char *s)
+wchar_t *alphabetic (wchar_t *s)
 {
-  static char alphstr[MAX_WORD_LENGTH + 1];
+  static wchar_t alphstr[MAX_WORD_LENGTH + 1];
   int i, pos;
 
   pos = 0;
-  for (i = 0; i < (int) strlen (s); i++) 
-    if (((s[i] >= 'A') && (s[i] <= 'Z')) || ((s[i] >= 'a') && (s[i] <= 'z')))
+  for (i = 0; i < (int) wcslen (s); i++) 
+    if (iswalpha(s[i]))
       alphstr[pos++] = s[i];
   alphstr[pos] = '\0';
 
   return (alphstr);
 }
 
-int numvowels (char *s)
+int numvowels (wchar_t *s)
 {
   int vcount;
-  char *cptr;
+  wchar_t *cptr;
 
   vcount = 0;
 
@@ -825,11 +834,11 @@ int numvowels (char *s)
   return (vcount);
 }
 
-void anagramr7 (char *s, char **accum, int *minkey, int *level)
+void anagramr7 (wchar_t *s, wchar_t **accum, int *minkey, int *level)
 {
   int i, j, extsuccess, icurlet, newminkey, s_mask;
-  char exts[MAX_WORD_LENGTH];
-  char tempword[MAX_WORD_LENGTH+50];
+  wchar_t exts[MAX_WORD_LENGTH];
+  wchar_t tempword[MAX_WORD_LENGTH+50];
 
 /*  Print arguments passed in for debugging purposes */
 
@@ -854,7 +863,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     passed in, we know this is a "dead end".    */
 
   if (maxdepthspec == 1)
-    if ((max_depth - *level) * longestlength < strlen(s))
+    if ((max_depth - *level) * longestlength < wcslen(s))
     {
       (*level)--;
       return;
@@ -893,12 +902,12 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     anagram -- treat as a dead end  */
 
     if (adjacentdups == 0)
-      if ((*level > 0) && (strcmp (words2ptrs[i], accum[*level - 1]) == 0)) 
+      if ((*level > 0) && (wcscmp (words2ptrs[i], accum[*level - 1]) == 0)) 
         continue;
 
 /*  Extract a word from the string being anagrammed.  */
 
-    strcpy (exts, extract (s, wordss[i]));
+    wcscpy (exts, extract (s, wordss[i]));
 
 /*  If the extraction was not possible, we are at a "dead end"  */
 
@@ -910,14 +919,14 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     if (*exts == '\0')
     {
       memset(tempword, '\0', sizeof(tempword));
-      strcpy (accum[*level], words2ptrs[i]);
-      for (j = 0; j < *level; j++) {strcat (tempword, accum[j]); strcat(tempword, " ");}
-      strcat(tempword, words2ptrs[i]);
-      if ((input == 0) && !strcmp(tempword, pristineinitword))
+      wcscpy (accum[*level], words2ptrs[i]);
+      for (j = 0; j < *level; j++) {wcscat (tempword, accum[j]); wcscat(tempword, L" ");}
+      wcscat(tempword, words2ptrs[i]);
+      if ((input == 0) && !wcscasecmp(tempword, pristineinitword))
           continue;
       rec_anag_count++;
       if (silent == 0) printf ("%6d.  ", rec_anag_count);
-      printf ("%s\n", tempword);
+      printf ("%ls\n", tempword);
       extsuccess = 1;
       continue;
     }
@@ -927,7 +936,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
 
     extsuccess = 1;
 
-    strcpy (accum[*level], words2ptrs[i]);
+    wcscpy (accum[*level], words2ptrs[i]);
     (*level)++;
 
     if (adjacentdups == 0)
@@ -950,7 +959,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
   return;
 }
 
-char *extract (char *s1, char *s2)
+wchar_t *extract (wchar_t *s1, wchar_t *s2)
 {
 
 /*  Returns the characters remaining in s1 after extracting the characters
@@ -965,20 +974,20 @@ char *extract (char *s1, char *s2)
                extract ("ABCDE", "ABF") returns "0"  ('zero', not 'oh')
 */
 
-  static char r1[MAX_WORD_LENGTH];
-  char t1[MAX_WORD_LENGTH];
-  char *s1p, *s2p, *r1p, *s1end, *s2end;
+  static wchar_t r1[MAX_WORD_LENGTH];
+  wchar_t t1[MAX_WORD_LENGTH];
+  wchar_t *s1p, *s2p, *r1p, *s1end, *s2end;
   int found, s1len, s2len;
 
   r1p = r1;
 
-  strcpy (t1, s1);
+  wcscpy (t1, s1);
   s1p = t1;
-  s1len = (int) strlen (s1p);
+  s1len = (int) wcslen (s1p);
   s1end = s1p + s1len;
 
   s2p = s2;
-  s2len = (int) strlen (s2);
+  s2len = (int) wcslen (s2);
   s2end = s2p + s2len;
 
   for (s2p = s2; s2p < s2end; s2p++)
@@ -1009,12 +1018,12 @@ char *extract (char *s1, char *s2)
   return (r1);
 }
 
-int intmask (char *s)
+int intmask (wchar_t *s)
 {
 
 /*  Assumes "s" is all uppercase */
 
-  char *sptr;
+  wchar_t *sptr;
   int mask;
 
   mask = 0;
