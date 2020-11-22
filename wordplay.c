@@ -65,9 +65,9 @@ int     vowelcheck;
 
 int    *lindx1; 
 int    *lindx2;
-int     findx1[30];
-int     findx2[30];
-int	findx12 = 30;
+int     findx1[50];
+int     findx2[50];
+int	findx12 = 50;
 
 wchar_t    pristineinitword[MAX_WORD_LENGTH];
 
@@ -693,7 +693,7 @@ int main (int argc, char *argv[])
   {
     curpos = 0;
     curlet = wordss[curpos][0];
-    icurlet = (int) curlet - (int) 'A';
+    icurlet = (int) curlet - (int) wordss[0][0];
     findx1[icurlet] = curpos;
     do
     {
@@ -711,7 +711,7 @@ int main (int argc, char *argv[])
       }
       findx2[icurlet] = curpos - 1;
       curlet = wordss[curpos][0];
-      icurlet = (int) curlet - (int) 'A';
+      icurlet = (int) curlet - (int) wordss[0][0];
       findx1[icurlet] = curpos;
     }
     while (curpos < ncount); 
@@ -752,7 +752,7 @@ int main (int argc, char *argv[])
     level = 0;
     rec_anag_count = 0;
 
-    minkey = findx1[(int) initword[0] - (int) 'A'];
+    minkey = findx1[(int) initword[0] - (int) wordss[0][0]];
 
     anagramr7 (initword, accum, &minkey, &level);
     if (rec_anag_count == 0) 
@@ -783,7 +783,7 @@ int main (int argc, char *argv[])
     level = 1;
     rec_anag_count = 0;
 
-    minkey = findx1[(int) remaininitword[0] - (int) 'A'];
+    minkey = findx1[(int) remaininitword[0] - (int) wordss[0][0]];
 
     anagramr7 (remaininitword, accum, &minkey, &level);
     if (rec_anag_count == 0)
@@ -884,7 +884,7 @@ void anagramr7 (wchar_t *s, wchar_t **accum, int *minkey, int *level)
 
   extsuccess = 0;
 
-  icurlet = (int) s[0] - (int) 'A';
+  icurlet = (int) s[0] - (int) wordss[0][0];
   for (i = max (*minkey, findx1[icurlet]); i <= findx2[icurlet]; i++)
   {
 
