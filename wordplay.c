@@ -531,7 +531,7 @@ int main (int argc, char *argv[])
   j = 1;
   for (i = 0; i < w2size; i++)
     if (j < ncount)
-      if (keymem[i] == '\0') wordss[j++] = keymem + i + 1;
+      if (keymem[i] == L'\0') wordss[j++] = keymem + i + 1;
 
 /*  Create the keys by sorting the characters of the words in the keymem space 
     in place, using the wordss index pointers.  */
@@ -755,7 +755,7 @@ int main (int argc, char *argv[])
 	exit(-1);
       }
 
-    accum[0][0] = '\0';
+    accum[0][0] = L'\0';
     level = 0;
     rec_anag_count = 0;
 
@@ -805,8 +805,8 @@ wchar_t *uppercase (wchar_t *s)
   static wchar_t upcasestr[MAX_WORD_LENGTH + 1];
   int i;
 
-  for (i = 0; i < (int) wcslen (s); i++) upcasestr[i] = toupper(s[i]);
-  upcasestr[i] = '\0';
+  for (i = 0; i < (int) wcslen (s); i++) upcasestr[i] = towupper(s[i]);
+  upcasestr[i] = L'\0';
 
   return (upcasestr);
 }
