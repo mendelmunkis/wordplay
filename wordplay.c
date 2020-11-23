@@ -36,6 +36,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define SAFETY_ZONE MAX_WORD_LENGTH + 1
 #define MAX_ANAGRAM_WORDS 32
 #define MAX_PATH_LENGTH 256
+#define CHAR_RANGE 50
 
 wchar_t *uppercase (wchar_t *s);
 wchar_t *alphabetic (wchar_t *s);
@@ -66,9 +67,9 @@ int     vowelcheck;
 
 int    *lindx1;
 int    *lindx2;
-int     findx1[50];
-int     findx2[50];
-int	findx12 = 50;
+int     findx1[CHAR_RANGE];
+int     findx2[CHAR_RANGE];
+int	findx12 = CHAR_RANGE;
 
 wchar_t    pristineinitword[MAX_WORD_LENGTH];
 
@@ -406,10 +407,10 @@ int main (int argc, char *argv[])
     w2memptr += wcslen (buffer) + 1;
     w2offset += wcslen (buffer) + 1;
 
-    if ((int) wcslen (alphbuffer) > longestlength) 
+    if ((int) wcslen (alphbuffer) > longestlength)
       longestlength = wcslen (alphbuffer);
 
-    if ((w2size - w2offset) < SAFETY_ZONE) 
+    if ((w2size - w2offset) < SAFETY_ZONE)
     {
        w2size += WORDBLOCKSIZE;
        if ((words2mem = (wchar_t *) realloc (words2mem, w2size)) == (wchar_t *) NULL)
@@ -440,14 +441,11 @@ int main (int argc, char *argv[])
   j = 1;
   for (i = 0; i < w2size; i++)
     if (j < ncount)
-      if ( (words2mem[i] == '\0') &&
-         ( (wcslen(words2mem + i + 1)) == wcslen(alphabetic(words2mem + i + 1)) ) )
-     {
+      if (words2mem[i] == '\0')
         words2[j++] = words2mem + i + 1;
-     }
 
 
-  if (silent == 0) printf ("\n%d words loaded (%d byte block).  " 
+  if (silent == 0) printf ("\n%d words loaded (%d byte block).  "
                            "Longest kept:  %d letters.\n",
 			    ncount, w2size, longestlength);
 
@@ -466,7 +464,7 @@ int main (int argc, char *argv[])
     exit (-1);
   }
 
-  for (i = 0; i < ncount; i++) 
+  for (i = 0; i < ncount; i++)
   {
     wcscpy (alphbuffer, alphabetic (words2[i]));
     wordsn[i] = (int) wcslen (alphbuffer); 
