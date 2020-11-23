@@ -154,7 +154,11 @@ int main (int argc, char *argv[])
   if (argc > 10)
       exit(0);
 
-  setlocale(LC_ALL, "");
+  if(setlocale(LC_ALL, "")==NULL)
+  {
+    printf("Error setting locale, exiting\n");
+    return -1;
+  }
 
   strcpy (word_file_name, DEFAULT_WORD_FILE);
 
@@ -248,7 +252,11 @@ int main (int argc, char *argv[])
     }
     else
     {
-      mbstowcs(tempword, argv[iarg], MAX_WORD_LENGTH);
+      if(mbstowcs(tempword, argv[iarg], MAX_WORD_LENGTH)<0)
+      {
+          printf("Failed to parse input string, exiting\n");
+          return -1;
+      }
       wcscpy(initword, uppercase(tempword));
       iarg++;
     }
