@@ -619,9 +619,9 @@ int main (int argc, char *argv[])
   if (listcandwords)
   {
     if (silent == 0) printf ("\nList of candidate words:\n");
-    for (i = 0; i < ncount; i++) 
+    for (i = 0; i < ncount; i++)
     {
-      if (silent == 0) 
+      if (silent == 0)
 	printf ("%6d.  %ls\n", i, words2[i]);
       else
 	printf ("%ls\n", words2[i]);
