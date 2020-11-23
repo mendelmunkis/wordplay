@@ -566,7 +566,7 @@ int main (int argc, char *argv[])
     for (i = 0; i < (size - gap); i++)
     {
       j = i + gap;
-      if (wcscasecmp (wordss[i], wordss[j]) > 0)
+      if (wcscmp (wordss[i], wordss[j]) > 0)
       {
 	wholdptr = wordss[i];
 	wordss[i] = wordss[j];
@@ -923,7 +923,7 @@ void anagramr7 (wchar_t *s, wchar_t **accum, int *minkey, int *level)
       wcscpy (accum[*level], words2ptrs[i]);
       for (j = 0; j < *level; j++) {wcscat (tempword, accum[j]); wcscat(tempword, L" ");}
       wcscat(tempword, words2ptrs[i]);
-      if ((input == 0) && !wcscasecmp(tempword, pristineinitword))
+      if ((input == 0) && !wcscmp(tempword, pristineinitword))
           continue;
       rec_anag_count++;
       if (silent == 0) printf ("%6d.  ", rec_anag_count);
