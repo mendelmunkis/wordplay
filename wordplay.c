@@ -3,6 +3,7 @@ parts released to public domain by Evans Criswell
 copyright 2016 Logan Rosen, David William Richmond Jones
 copyright 2017 Innocent De Marchi
 copyright 2019 Moshe Piekarski, Clayton Smith
+copyright 2020 Moshe Piekarski
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,23 +37,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAX_ANAGRAM_WORDS 32
 #define MAX_PATH_LENGTH 256
 
-wchar_t   *uppercase (wchar_t *s);
-wchar_t   *alphabetic (wchar_t *s);
+wchar_t *uppercase (wchar_t *s);
+wchar_t *alphabetic (wchar_t *s);
 int     numvowels (wchar_t *s);
 void    anagramr7 (wchar_t *s, wchar_t **accum, int *minkey, int *level);
-wchar_t   *extract (wchar_t *s1, wchar_t *s2);
+wchar_t *extract (wchar_t *s1, wchar_t *s2);
 int     intmask (wchar_t *s);
 
 wchar_t  **words2;  /* Candidate word index (pointers to the words) */
-wchar_t   *words2mem;  /* Memory block for candidate words  */
+wchar_t *words2mem;  /* Memory block for candidate words  */
 wchar_t  **words2ptrs; /* For copying the word indexes */
 wchar_t  **wordss;    /* Keys */
-wchar_t   *keymem;     /* Memory block for keys */
-int    *wordsn;    /* Lengths of each word in words2 */
-int    *wordmasks; /* Mask of which letters are contained in each word */
+wchar_t *keymem;     /* Memory block for keys */
+int     *wordsn;    /* Lengths of each word in words2 */
+int     *wordmasks; /* Mask of which letters are contained in each word */
 int     ncount;    /* Number of candidate words */
 int     longestlength; /*  Length of longest word in words2 array */
-wchar_t    largestlet;
+wchar_t largestlet;
 int     rec_anag_count;  /*  For recursive algorithm, keeps track of number
 			 of anagrams fond */
 int     adjacentdups;
@@ -63,7 +64,7 @@ int     input;
 int     max_depth;
 int     vowelcheck;
 
-int    *lindx1; 
+int    *lindx1;
 int    *lindx2;
 int     findx1[50];
 int     findx2[50];
@@ -73,51 +74,51 @@ wchar_t    pristineinitword[MAX_WORD_LENGTH];
 
 int main (int argc, char *argv[])
 {
-  FILE    *word_file_ptr;
-  wchar_t     buffer[MAX_WORD_LENGTH];
-  wchar_t     ubuffer[MAX_WORD_LENGTH]; 
-  wchar_t     alphbuffer[MAX_WORD_LENGTH];
-  wchar_t     initword[MAX_WORD_LENGTH];
-  wchar_t     remaininitword[MAX_WORD_LENGTH];
+  FILE     *word_file_ptr;
+  wchar_t  buffer[MAX_WORD_LENGTH];
+  wchar_t  ubuffer[MAX_WORD_LENGTH];
+  wchar_t  alphbuffer[MAX_WORD_LENGTH];
+  wchar_t  initword[MAX_WORD_LENGTH];
+  wchar_t  remaininitword[MAX_WORD_LENGTH];
   char     word_file_name[MAX_PATH_LENGTH];
-  wchar_t     first_word[MAX_WORD_LENGTH];
-  wchar_t     u_first_word[MAX_WORD_LENGTH];
-  wchar_t     tempword[MAX_WORD_LENGTH];
+  wchar_t  first_word[MAX_WORD_LENGTH];
+  wchar_t  u_first_word[MAX_WORD_LENGTH];
+  wchar_t  tempword[MAX_WORD_LENGTH];
   int      ilength;                           /* Length of initword */
-  int      size; 
+  int      size;
   int      gap;
   int      switches;
   int      iholdn;
-  wchar_t     chold;
-  wchar_t    *wholdptr;
+  wchar_t  chold;
+  wchar_t  *wholdptr;
   int      curlen;
-  int      curpos; 
-  wchar_t     curlet; 
+  int      curpos;
+  wchar_t  curlet;
   int      icurlet;
   int      recursiveanag;
-  int      listcandwords; 
+  int      listcandwords;
   int      wordfilespec;
-  int      firstwordspec; 
-  int      maxcwordlength; 
+  int      firstwordspec;
+  int      maxcwordlength;
   int      mincwordlength;
   int      iarg;
-  int      keyi; 
+  int      keyi;
   int      keyj;
-  wchar_t   **accum;
+  wchar_t  **accum;
   int      level;
   int      minkey;
-  wchar_t     leftover[MAX_WORD_LENGTH];
+  wchar_t  leftover[MAX_WORD_LENGTH];
   int      w2size;
-  wchar_t    *w2memptr;
+  wchar_t  *w2memptr;
   int      w2offset;
-  wchar_t    *keymemptr;
+  wchar_t  *keymemptr;
   int      keyoffset;
-  wchar_t     no[3] = L"no";
-  wchar_t     yes[4] = L"yes";
+  char     no[3] = "no";
+  char     yes[4] = "yes";
   int      fileinput;
   int      hasnumber;
-  int      i; 
-  int      j; 
+  int      i;
+  int      j;
   int      k;
 
 /*
