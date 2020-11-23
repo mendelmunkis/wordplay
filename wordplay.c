@@ -285,7 +285,7 @@ int main (int argc, char *argv[])
   wcscpy (tempword, alphabetic (initword));
   if(wcslen(initword) != wcslen(alphabetic (initword)))
    {
-   if (silent == 0) printf("Warning: Characters that are not part of the english alphabet have been removed.\n");
+   if (silent == 0) printf("Warning: Non-alphabetic characters have been removed.\n");
    }
   wcscpy (initword, tempword);
 
