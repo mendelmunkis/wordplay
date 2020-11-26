@@ -59,7 +59,7 @@ int     input;
 int     max_depth;
 int     vowelcheck;
 
-int    *lindx1; 
+int    *lindx1;
 int    *lindx2;
 int     findx1[30];
 int     findx2[30];
@@ -80,24 +80,24 @@ int main (int argc, char *argv[])
   char     u_first_word[MAX_WORD_LENGTH];
   char     tempword[MAX_WORD_LENGTH];
   int      ilength;                           /* Length of initword */
-  int      size; 
+  int      size;
   int      gap;
   int      switches;
   int      iholdn;
   char     chold;
   char    *wholdptr;
   int      curlen;
-  int      curpos; 
-  char     curlet; 
+  int      curpos;
+  char     curlet;
   int      icurlet;
   int      recursiveanag;
-  int      listcandwords; 
+  int      listcandwords;
   int      wordfilespec;
-  int      firstwordspec; 
-  int      maxcwordlength; 
+  int      firstwordspec;
+  int      maxcwordlength;
   int      mincwordlength;
   int      iarg;
-  int      keyi; 
+  int      keyi;
   int      keyj;
   char   **accum;
   int      level;
@@ -112,8 +112,8 @@ int main (int argc, char *argv[])
   char     yes[4] = "yes";
   int      fileinput;
   int      hasnumber;
-  int      i; 
-  int      j; 
+  int      i;
+  int      j;
   int      k;
 
 /*
@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
 
   if (argc < 2)
   {
-    fprintf (stderr, 
+    fprintf (stderr,
 	    "Wordplay Version 8  05-05-19 originally by Evans A Criswell\n");
     fprintf (stderr, "Usage:  ");
     fprintf (stderr, "wordplay string_to_anagram [-slxavnXmXdX] [-w word] "
@@ -163,7 +163,7 @@ int main (int argc, char *argv[])
 
   max_depth = MAX_ANAGRAM_WORDS;
 
-  iarg = 1;   
+  iarg = 1;
   while (iarg < argc)
   {
     if (wordfilespec == 1)
@@ -209,7 +209,7 @@ int main (int argc, char *argv[])
             case 'm' : maxcwordlength = 0;
 		       i++;
 		       while ((argv[iarg][i] >= '0') && (argv[iarg][i] <= '9'))
-			 maxcwordlength = maxcwordlength * 10 + 
+			 maxcwordlength = maxcwordlength * 10 +
 					  ((int) argv[iarg][i++] - (int) '0');
                        i--;
 		       break;
@@ -227,7 +227,7 @@ int main (int argc, char *argv[])
 			             ((int) argv[iarg][i++] - (int) '0');
                        i--;
 		       break;
-            default  : fprintf (stderr, "Invalid option: \"%c\" - Ignored\n", 
+            default  : fprintf (stderr, "Invalid option: \"%c\" - Ignored\n",
 				argv[iarg][i]);
                        break;
 	  }
@@ -317,7 +317,7 @@ int main (int argc, char *argv[])
     }
     if (strlen (remaininitword) == 0)
     {
-      if (silent == 0) 
+      if (silent == 0)
       {
 	printf ("Anagrams found:\n");
 	printf ("     0.  %s\n", u_first_word);
@@ -367,7 +367,7 @@ int main (int argc, char *argv[])
   w2offset = 0;
   longestlength = 0;
 
-  while (fgets (buffer, MAX_WORD_LENGTH, word_file_ptr) != 
+  while (fgets (buffer, MAX_WORD_LENGTH, word_file_ptr) !=
 	 (char *) NULL)
   {
     j = (int) strlen (buffer) - 1;
@@ -378,7 +378,7 @@ int main (int argc, char *argv[])
 
     strcpy (alphbuffer, alphabetic (buffer));
 
-    if (((int) strlen (alphbuffer) < mincwordlength) || 
+    if (((int) strlen (alphbuffer) < mincwordlength) ||
 	((int) strlen (alphbuffer) > maxcwordlength))
       continue;
 
@@ -396,10 +396,10 @@ int main (int argc, char *argv[])
     w2memptr += strlen (buffer) + 1;
     w2offset += strlen (buffer) + 1;
 
-    if ((int) strlen (alphbuffer) > longestlength) 
+    if ((int) strlen (alphbuffer) > longestlength)
       longestlength = strlen (alphbuffer);
 
-    if ((w2size - w2offset) < SAFETY_ZONE) 
+    if ((w2size - w2offset) < SAFETY_ZONE)
     {
        w2size += WORDBLOCKSIZE;
        if ((words2mem = (char *) realloc (words2mem, w2size)) == (char *) NULL)
@@ -410,7 +410,7 @@ int main (int argc, char *argv[])
        w2memptr = words2mem + w2offset;
     }
 
-    i++; 
+    i++;
     ncount = i;
   }
 
@@ -437,7 +437,7 @@ int main (int argc, char *argv[])
      }
 
 
-  if (silent == 0) printf ("\n%d words loaded (%d byte block).  " 
+  if (silent == 0) printf ("\n%d words loaded (%d byte block).  "
                            "Longest kept:  %d letters.\n",
 			    ncount, w2size, longestlength);
 
@@ -456,15 +456,15 @@ int main (int argc, char *argv[])
     exit (-1);
   }
 
-  for (i = 0; i < ncount; i++) 
+  for (i = 0; i < ncount; i++)
   {
     strcpy (alphbuffer, alphabetic (words2[i]));
-    wordsn[i] = (int) strlen (alphbuffer); 
+    wordsn[i] = (int) strlen (alphbuffer);
   }
 
 /* Make a copy of the pointers from the words2 array (called words2ptrs) */
 
-  if ((words2ptrs = (char **) malloc (ncount * sizeof (char *))) == 
+  if ((words2ptrs = (char **) malloc (ncount * sizeof (char *))) ==
       (char **) NULL)
   {
     fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
@@ -473,7 +473,7 @@ int main (int argc, char *argv[])
 
   for (i = 0; i < ncount; i++) words2ptrs[i] = words2[i];
 
-/* Make a copy of the word list, then sort each word in the new list 
+/* Make a copy of the word list, then sort each word in the new list
    putting letters of the words in alphabetical order */
 
 /*  Malloc the pointers for the list of keys */
@@ -517,7 +517,7 @@ int main (int argc, char *argv[])
     if (j < ncount)
       if (keymem[i] == '\0') wordss[j++] = keymem + i + 1;
 
-/*  Create the keys by sorting the characters of the words in the keymem space 
+/*  Create the keys by sorting the characters of the words in the keymem space
     in place, using the wordss index pointers.  */
 
   for (k = 0; k < ncount; k++)
@@ -543,7 +543,7 @@ int main (int argc, char *argv[])
     while ((switches != 0) | (gap != 1));
   }
 
-/* Sort the second "sorted" list of candidate words by first letter, 
+/* Sort the second "sorted" list of candidate words by first letter,
    keeping references to the original word list, sorted by length (words2)
    intact (the words2ptrs array).   */
 
@@ -603,9 +603,9 @@ int main (int argc, char *argv[])
   if (listcandwords)
   {
     if (silent == 0) printf ("\nList of candidate words:\n");
-    for (i = 0; i < ncount; i++) 
+    for (i = 0; i < ncount; i++)
     {
-      if (silent == 0) 
+      if (silent == 0)
 	printf ("%6d.  %s\n", i, words2[i]);
       else
 	printf ("%s\n", words2[i]);
@@ -618,15 +618,15 @@ int main (int argc, char *argv[])
    Of course, the algorithm below works because words2 has already
    been sorted by word length earlier.  */
 
-  if ((lindx1 = (int *) malloc ((longestlength + 1) * sizeof (int))) 
-	                == (int *) NULL) 
+  if ((lindx1 = (int *) malloc ((longestlength + 1) * sizeof (int)))
+	                == (int *) NULL)
   {
     fprintf (stderr, "Insufficient memory.  malloc() returned NULL.\n");
     exit (-1);
   }
 
-  if ((lindx2 = (int *) malloc ((longestlength + 1) * sizeof (int))) 
-	                == (int *) NULL) 
+  if ((lindx2 = (int *) malloc ((longestlength + 1) * sizeof (int)))
+	                == (int *) NULL)
   {
     fprintf (stderr, "Insufficient memory.  malloc() returned NULL.\n");
     exit (-1);
@@ -662,12 +662,12 @@ int main (int argc, char *argv[])
       curlen = wordsn[curpos];
       lindx1[curlen] = curpos;
     }
-    while (curpos < ncount); 
+    while (curpos < ncount);
   }
 
 /* Create indexes into wordss array by first letter.  Words with first
-   letter "A" will be will be in elements findx1[i] through findx2[i] 
-   of array wordss.  Of course, the algorithm below works because 
+   letter "A" will be will be in elements findx1[i] through findx2[i]
+   of array wordss.  Of course, the algorithm below works because
    wordss has already been sorted by first letter earlier.  */
 
 /*
@@ -690,7 +690,7 @@ int main (int argc, char *argv[])
     {
       while (curpos < ncount)
       {
-	if (wordss[curpos][0] == curlet) 
+	if (wordss[curpos][0] == curlet)
 	  curpos++;
         else
 	  break;
@@ -705,7 +705,7 @@ int main (int argc, char *argv[])
       icurlet = (int) curlet - (int) 'A';
       findx1[icurlet] = curpos;
     }
-    while (curpos < ncount); 
+    while (curpos < ncount);
   }
 
 /* Create masks (integers describing which letters are in each word */
@@ -724,7 +724,7 @@ int main (int argc, char *argv[])
   {
     if (silent == 0) printf ("\nAnagrams found:\n");
 
-    if ((accum = (char **) malloc (MAX_ANAGRAM_WORDS * sizeof (char *))) == 
+    if ((accum = (char **) malloc (MAX_ANAGRAM_WORDS * sizeof (char *))) ==
 	(char **) NULL)
     {
       fprintf (stderr, "Insufficient memory; malloc returned NULL.\n");
@@ -746,8 +746,8 @@ int main (int argc, char *argv[])
     minkey = findx1[(int) initword[0] - (int) 'A'];
 
     anagramr7 (initword, accum, &minkey, &level);
-    if (rec_anag_count == 0) 
-      if (silent == 0) 
+    if (rec_anag_count == 0)
+      if (silent == 0)
 	printf ("\nNo anagrams found by recursive algorithm.\n");
   }
 
@@ -801,7 +801,7 @@ char *alphabetic (char *s)
   int i, pos;
 
   pos = 0;
-  for (i = 0; i < (int) strlen (s); i++) 
+  for (i = 0; i < (int) strlen (s); i++)
     if (((s[i] >= 'A') && (s[i] <= 'Z')) || ((s[i] >= 'a') && (s[i] <= 'z')))
       alphstr[pos++] = s[i];
   alphstr[pos] = '\0';
@@ -819,7 +819,7 @@ int numvowels (char *s)
   for (cptr = s; *cptr != '\0'; cptr++)
     switch (*cptr)
     {
-      case 'A':  case 'E':  case 'I':  case 'O':  case 'U':  case 'Y':  
+      case 'A':  case 'E':  case 'I':  case 'O':  case 'U':  case 'Y':
 	vcount++; break;
     }
   return (vcount);
@@ -835,7 +835,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
 
 /*
   printf ("------------------------------------------------\n");
-  printf ("anagramr called with: (\"%s\", (", s);  
+  printf ("anagramr called with: (\"%s\", (", s);
 
   for (i = 0; i < *level; i++) printf ("\"%s\" ", accum[i]);
   printf ("), %d, %d)\n", *minkey, *level);
@@ -843,7 +843,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
 
 /*  Exceeded depth specified by user */
 
-  if (*level >= max_depth) 
+  if (*level >= max_depth)
   {
     (*level)--;
     return;
@@ -893,7 +893,7 @@ void anagramr7 (char *s, char **accum, int *minkey, int *level)
     anagram -- treat as a dead end  */
 
     if (adjacentdups == 0)
-      if ((*level > 0) && (strcmp (words2ptrs[i], accum[*level - 1]) == 0)) 
+      if ((*level > 0) && (strcmp (words2ptrs[i], accum[*level - 1]) == 0))
         continue;
 
 /*  Extract a word from the string being anagrammed.  */
@@ -955,7 +955,7 @@ char *extract (char *s1, char *s2)
 
 /*  Returns the characters remaining in s1 after extracting the characters
     one by one that appear in s2.  If the extraction is impossible (if s2
-    contains a character not in s1), the string "0" (zero) is returned.   If 
+    contains a character not in s1), the string "0" (zero) is returned.   If
     no characters remain in s1 after the extraction, then the null string ""
     is returned.
 
@@ -993,7 +993,7 @@ char *extract (char *s1, char *s2)
         break;
       }
     }
-    if (found == 0) 
+    if (found == 0)
     {
       *r1 = '0';
       *(r1 + 1) = '\0';
@@ -1018,7 +1018,7 @@ int intmask (char *s)
   int mask;
 
   mask = 0;
-  for (sptr = s; *sptr != '\0'; sptr++) 
+  for (sptr = s; *sptr != '\0'; sptr++)
     if ((*sptr >= 'A') && (*sptr <= 'Z')) mask |= 1 << (int) (*sptr - 'A');
 
   return (mask);
