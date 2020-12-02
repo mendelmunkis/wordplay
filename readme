@@ -196,6 +196,8 @@ If the option specifiers are combined, as in "an7m7d5f" or "d3n5f", the f
 should come last, followed by a space and the word list file, as shown in 
 example number 4 above.
 
+The word file must be in a UTF-8 compatible encoding.
+
 The "w" option is used in the same manner.
 
 ------------------------------------------------------------------------------
