@@ -71,6 +71,7 @@ UChar    pristineinitword[MAX_WORD_LENGTH];
 int main (int argc, char *argv[])
 {
   UFILE   *word_file_ptr;
+  UFILE   *err;
   UChar    buffer[MAX_WORD_LENGTH];
   UChar    ubuffer[MAX_WORD_LENGTH];
   UChar    alphbuffer[MAX_WORD_LENGTH];
@@ -264,7 +265,7 @@ int main (int argc, char *argv[])
     printf ("Minimum word length :  %d\n\n", mincwordlength);
 
     if (specfirstword)
-      printf ("First word          :  \"%s\"\n", first_word);
+      u_printf ("First word          :  \"%S\"\n", first_word);
 
     printf ("Word list file      :  \"%s\"\n", word_file_name);
     u_printf ("String to anagram   :  \"%S\"\n", initword);
@@ -306,14 +307,14 @@ int main (int argc, char *argv[])
 
 /*  Extract first_word (if specified) from initword and store in
     remaininitword  */
-
+  err = u_finit(stderr,NULL,NULL);
   if (specfirstword)
   {
     u_strcpy (u_first_word, uppercase(first_word));
     u_strcpy (remaininitword, extract (initword, u_first_word));
     if (remaininitword[0] == '0')
     {
-      fprintf (stderr, "Specified first word \"%s\" cannot be extracted "
+      u_fprintf (err, "Specified first word \"%s\" cannot be extracted "
 		       "from initial string \"%s\"\n", u_first_word, initword);
       exit (1);
     }
@@ -322,10 +323,10 @@ int main (int argc, char *argv[])
       if (silent == 0)
       {
 	printf ("Anagrams found:\n");
-	printf ("     0.  %s\n", u_first_word);
+	u_printf ("     0.  %S\n", u_first_word);
       }
       else
-	printf ("%s\n", u_first_word);
+	u_printf ("%S\n", u_first_word);
       exit (0);
     }
 
@@ -605,9 +606,9 @@ int main (int argc, char *argv[])
     for (i = 0; i < ncount; i++)
     {
       if (silent == 0)
-	printf ("%6d.  %s\n", i, words2[i]);
+	u_printf ("%6d.  %S\n", i, words2[i]);
       else
-	printf ("%s\n", words2[i]);
+	u_printf ("%S\n", words2[i]);
     }
   }
 
