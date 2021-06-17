@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ctype.h>
 #include <stdlib.h>
 #include "unicode/ustdio.h"
+#include "unicode/unorm2.h"
 
 #define max(A, B) ((A) > (B) ? (A) : (B))
 #define min(A, B) ((A) < (B) ? (A) : (B))
@@ -240,7 +241,10 @@ int main (int argc, char *argv[])
     }
     else
     {
-      u_uastrcpy (tempword, argv[iarg]);
+      u_uastrcpy (initword, argv[iarg]);
+/* Remove non-alphabetic characters from initword */
+      u_strcpy (pristineinitword, initword);
+      u_strcpy (tempword, alphabetic(initword));
       u_strcpy (initword, uppercase(tempword));
       iarg++;
     }
@@ -268,18 +272,10 @@ int main (int argc, char *argv[])
       u_printf ("First word          :  \"%S\"\n", first_word);
 
     printf ("Word list file      :  \"%s\"\n", word_file_name);
+//    u_printf ("Input string        :  \"%S\"\n", pristineinitword);
     u_printf ("String to anagram   :  \"%S\"\n", initword);
     printf ("\n");
   }
-
-/* Remove non-alphabetic characters from initword */
-  u_strcpy (pristineinitword, initword);
-  u_strcpy (tempword, alphabetic (initword));
-  if(u_strlen(initword) != u_strlen(alphabetic (initword)))
-   {
-   if (silent == 0) printf("Warning: Non-alphabetic characters have been removed.\n");
-   }
-  u_strcpy (initword, tempword);
 
   ilength = (int) u_strlen (initword);
 
@@ -798,13 +794,18 @@ UChar *uppercase (UChar *s)
 UChar *alphabetic (UChar *s)
 {
   static UChar alphstr[MAX_WORD_LENGTH + 1];
+  static UChar normal[MAX_WORD_LENGTH + 1];
   int i, pos;
 
+  UChar  *d = &normal[0];
+  UErrorCode errorCode = U_ZERO_ERROR;
+//  unorm2_normalize(unorm2_getNFKDInstance(&errorCode), s, -1, d, MAX_WORD_LENGTH, &errorCode);
+  unorm2_normalize(unorm2_getInstance(NULL, "nfkc", UNORM2_DECOMPOSE, &errorCode), s, -1, d, MAX_WORD_LENGTH, &errorCode);
   pos = 0;
-  for (i = 0; i < (int) u_strlen (s); i++)
+  for (i = 0; i < (int) u_strlen (d); i++)
 //    if (((s[i]>'A') && (s[i]<'Z'))|| ((s[i]>'a')&& (s[i]<'z')))
-    if (u_isalpha(s[i]))
-      alphstr[pos++] = s[i];
+    if (u_isalpha(d[i]))
+      alphstr[pos++] = d[i];
   alphstr[pos] = '\0';
 
   return (alphstr);
