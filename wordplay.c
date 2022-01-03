@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <stdlib.h>
 #include "unicode/ustdio.h"
 #include "unicode/unorm2.h"
@@ -53,6 +54,7 @@ int     longestlength; /*  Length of longest word in words2 array */
 UChar   largestlet;
 int     rec_anag_count;  /*  For recursive algorithm, keeps track of number
 			 of anagrams fond */
+/* options block */
 int     adjacentdups;
 int     specfirstword;
 int     maxdepthspec;
@@ -60,6 +62,8 @@ int     silent;
 int     input;
 int     max_depth;
 int     vowelcheck;
+enum    language {english,hebrew,turkish} lang;
+int     decompose;
 
 int    *lindx1;
 int    *lindx2;
@@ -67,7 +71,8 @@ int     findx1[30];
 int     findx2[30];
 int	findx12 = 30;
 
-UChar    pristineinitword[MAX_WORD_LENGTH];
+UChar      pristineinitword[MAX_WORD_LENGTH];
+UErrorCode errorCode;
 
 int main (int argc, char *argv[])
 {
@@ -97,6 +102,7 @@ int main (int argc, char *argv[])
   int      listcandwords;
   int      wordfilespec;
   int      firstwordspec;
+  int      languagespec;
   int      maxcwordlength;
   int      mincwordlength;
   int      iarg;
@@ -130,8 +136,8 @@ int main (int argc, char *argv[])
     fprintf (stderr,
 	    "Wordplay Version 8  05-05-19 originally by Evans A Criswell\n");
     fprintf (stderr, "Usage:  ");
-    fprintf (stderr, "wordplay string_to_anagram [-slxavnXmXdX] [-w word] "
-		     "[-f word_file]\n\n");
+    fprintf (stderr, "wordplay string_to_anagram [-silxavnXmXdX] [-w word] "
+		     "[-f word_file] [-L language]\n\n");
     fprintf (stderr, "Capital X represents an integer.\n\n");
     fprintf (stderr, "s  = silent operation (no header or line numbers)\n");
     fprintf (stderr, "i  = include input phrase in anagram list\n");
@@ -144,6 +150,8 @@ int main (int argc, char *argv[])
     fprintf (stderr, "dX = limit anagrams to d words\n\n");
     fprintf (stderr, "w word = word to start anagrams\n");
     fprintf (stderr, "f file = word file to use (\"-f -\" for stdin)\n\n");
+    fprintf (stderr, "L language  = specify the text language (takes a two "
+                     "letter language code) \n");
     fprintf (stderr, "Suggestion:  Run \"wordplay trymenow\" "
 		     " to get started.\n");
     exit(-1);
@@ -160,6 +168,9 @@ int main (int argc, char *argv[])
   input = 0;
   vowelcheck = 1;
   maxdepthspec = 0;
+  languagespec = 0;
+  lang = english;
+  decompose = 0;
 
   maxcwordlength = MAX_WORD_LENGTH;
   mincwordlength = 0;
@@ -181,6 +192,30 @@ int main (int argc, char *argv[])
       u_uastrcpy (first_word, argv[iarg]);
       iarg++;
       firstwordspec = 0;
+      continue;
+    }
+    if (languagespec == 1)
+    {
+      i=0;
+      buffer[i]=tolower(argv[iarg][i]);
+      i++;
+      buffer[i]=tolower(argv[iarg][i]);
+      switch(((int) buffer[0]<<CHAR_BIT)+buffer[1])
+      {
+        case 26725 : lang = hebrew;
+                     vowelcheck = 0;
+                     decompose = 1;
+                     break;
+        case 29810 : lang = turkish;
+                     break;
+        default    : fprintf (stderr, "This language has not been implemented, "
+                                      "please file a bug report.\n"); 
+        //fallthrough
+        case 25966 : lang = english;
+                     break;
+      }
+      iarg++;
+      languagespec = 0;
       continue;
     }
     if (argv[iarg][0] == '-')
@@ -229,6 +264,8 @@ int main (int argc, char *argv[])
 			 max_depth = max_depth * 10 +
 			             ((int) argv[iarg][i++] - (int) '0');
                        i--;
+		       break;
+            case 'L' : languagespec=1;
 		       break;
             default  : fprintf (stderr, "Invalid option: \"%c\" - Ignored\n",
 				argv[iarg][i]);
@@ -391,7 +428,7 @@ int main (int argc, char *argv[])
     u_strcpy (leftover, extract (initword, ubuffer));
     if (leftover[0] == '0') continue;
 
-    u_strcpy (w2memptr, uppercase(buffer));
+    u_strcpy (w2memptr, buffer);
     w2memptr += u_strlen (buffer) + 1;
     w2offset += u_strlen (buffer) + 1;
 
@@ -783,9 +820,26 @@ int main (int argc, char *argv[])
 UChar *uppercase (UChar *s)
 {
   static UChar upcasestr[MAX_WORD_LENGTH + 1];
+  static UChar letters[6];
   int i;
 
-  for (i = 0; i < (int) u_strlen (s); i++) upcasestr[i] = toupper(s[i]);
+  if(lang == hebrew)
+  {
+    letters[0] = 0x5da;
+    letters[1] = 0x5dd;
+    letters[2] = 0x5df;
+    letters[3] = 0x5e3;
+    letters[4] = 0x5e5;
+  }
+
+  for (i = 0; i < (int) u_strlen (s); i++)
+  {
+    if(lang == turkish && s[i] == 'i')
+      s[i] = 304;
+    if(lang == hebrew && u_strchr32(letters, s[i]))
+      s[i]++;
+  }
+  u_strToUpper(upcasestr, MAX_WORD_LENGTH, s, -1, "C.UTF-8", &errorCode);
   upcasestr[i] = '\0';
 
   return (upcasestr);
@@ -798,9 +852,11 @@ UChar *alphabetic (UChar *s)
   int i, pos;
 
   UChar  *d = &normal[0];
-  UErrorCode errorCode = U_ZERO_ERROR;
+  if(decompose == 1 )
 //  unorm2_normalize(unorm2_getNFKDInstance(&errorCode), s, -1, d, MAX_WORD_LENGTH, &errorCode);
-  unorm2_normalize(unorm2_getInstance(NULL, "nfkc", UNORM2_DECOMPOSE, &errorCode), s, -1, d, MAX_WORD_LENGTH, &errorCode);
+    unorm2_normalize(unorm2_getInstance(NULL, "nfkc", UNORM2_DECOMPOSE, &errorCode), s, -1, d, MAX_WORD_LENGTH, &errorCode);
+  else
+    u_strcpy(d, s);
   pos = 0;
   for (i = 0; i < (int) u_strlen (d); i++)
 //    if (((s[i]>'A') && (s[i]<'Z'))|| ((s[i]>'a')&& (s[i]<'z')))
