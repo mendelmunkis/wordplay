@@ -117,6 +117,10 @@ Other options:
       New feature:  Use a hyphen as the filename if the wordlist should
       be read from stdin. 
 
+  L:  Specify a two letter language code.  This is useful if you have letters
+      which require unusual normalization. This option currently supports a
+      limited number of languages.
+
 
 Examples of usage:
 
