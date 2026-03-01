@@ -3,6 +3,7 @@ parts released to public domain by Evans Criswell
 copyright 2016 Logan Rosen, David William Richmond Jones
 copyright 2017 Innocent De Marchi
 copyright 2019 Moshe Piekarski, Clayton Smith
+copyright 2026 Moshe Piekarski
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -135,7 +136,7 @@ int main (int argc, char *argv[])
   if (argc < 2)
   {
     fprintf (stderr,
-	    "Wordplay Version 8  05-05-19 originally by Evans A Criswell\n");
+	    "Wordplay Version 9  03-01-26 originally by Evans A Criswell\n");
     fprintf (stderr, "Usage:  ");
     fprintf (stderr, "wordplay string_to_anagram [-silxavnXmXdX] [-w word] "
 		     "[-f word_file] [-L language]\n\n");
