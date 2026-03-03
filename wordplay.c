@@ -51,7 +51,7 @@ UChar **wordss;    /* Keys */
 UChar  *keymem;     /* Memory block for keys */
 int    *wordsn;    /* Lengths of each word in words2 */
 int    *wordmasks; /* Mask of which letters are contained in each word */
-int     ncount;    /* Number of candidate words */
+size_t  ncount;    /* Number of candidate words */
 int     longestlength; /*  Length of longest word in words2 array */
 UChar   largestlet;
 int     rec_anag_count;  /*  For recursive algorithm, keeps track of number
