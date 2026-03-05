@@ -472,7 +472,7 @@ int main (int argc, char *argv[])
         words2[j++] = words2mem + i + 1;
 
 
-  if (silent == 0) printf ("\n%d words loaded (%d byte block).  "
+  if (silent == 0) printf ("\n%zu words loaded (%d byte block).  "
                            "Longest kept:  %d letters.\n",
 			    ncount, w2size, longestlength);
 
